@@ -36,7 +36,7 @@ The draft never contains the user's address, phone or email unless the user type
 
 ## Sweep mode
 
-    Warranty calendar, {today}, next {window} days
+    Warranty calendar, {today}, next {window} (to {window end date})
     Ending soon (value losing cover: {sum of purchase prices}):
       - {date}: {brand} {model} {coverage type} ({path}). {one practical line}
     Active later:
