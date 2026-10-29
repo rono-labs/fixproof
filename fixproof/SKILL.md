@@ -92,7 +92,7 @@ The parent computes each end date from the real purchase date and term, using th
 - **Not covered**: every term has ended. Say when the last one ended.
 - **Unclear**: dates or terms conflict, or the symptom may fall under an exclusion. Say exactly what conflicts and what would settle it.
 
-Show the reasoning in one line, for example: "Bought 14 Mar 2024 + 2-year warranty = ended 14 Mar 2026. Protection plan PP-55120 runs to 14 Mar 2029, so covered by the plan."
+Show the reasoning in one line, for example: "Bought 14 Mar 2024 + 2-year warranty = ended 14 Mar 2026. Protection plan EPP-3Y-90417733 runs to 14 Mar 2029, so covered by the plan."
 
 When the receipt, the warranty documents and any rating-plate photo all exist, cross-check them:
 
