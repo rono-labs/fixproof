@@ -31,7 +31,7 @@ If the product is still unknown after Step 0, ask one short question ("Which app
 
 How values move between steps: every `{slot}` in a delegate instruction below is replaced with the real value from an upstream result (a path, model number or date that an expert actually returned) or from the user's words before the delegation is sent. Never send a slot unfilled, and never write "the file from before" inside an instruction. If a slot has no real value, leave that part of the instruction out and say what is missing.
 
-**Model series.** Manuals often cover a series. Derive `{series}` from the real model number: keep the letters and the first two digits and replace the remaining digits with x (ADW-4820 becomes ADW-48xx). Search for both the model and the series.
+**Model series.** Manuals often cover a series. Derive `{series}` from the real model number: keep the letters and the first two digits and replace the remaining digits with x (ADW-4820 becomes ADW-48xx). Search for both the model and the series. If the model has fewer than four digits or does not start with letters (WM-7, 55Q8), leave the series out.
 
 # Supported capabilities
 
@@ -61,7 +61,7 @@ People photograph the blinking display and the rating plate before they ask. Pho
 
 - delegate --target photo-agent --instruction 'Search photos taken in the last 48 hours, up to {now}, for pictures of an appliance control panel or display showing an error code, or of an appliance rating plate or serial label. For each photo found, run text recognition and return the photo path, the time taken and the recognised text. If there are no results, say zero matches.'
 
-From the recognised text, take the error code, brand, model and serial if present, and add the photos to the evidence list. Text that does not name an appliance counts as no match. If the user's words and the photo disagree (the user says dishwasher, the plate says washing machine), ask which one, report `waiting_user`, and stop until the user replies. An empty result is normal: continue with the user's words.
+From the recognised text, take the error code, brand, model and serial if present, and add the photos to the evidence list. Use a photo only when its text shows an error code or names the product type or a brand, and, if the user named the product, only when it does not name a different product type or brand. Ignore every other recent photo. If the user's words and the photo disagree (the user says dishwasher, the plate says washing machine), ask which one, report `waiting_user`, and stop until the user replies. An empty result is normal: continue with the user's words.
 
 ### Step 1. Find the purchase record
 
@@ -71,9 +71,9 @@ file-agent find matches names, folders, types and dates, not document text, so s
 
 Many paper receipts exist only as phone photos:
 
-- delegate --target photo-agent --instruction 'Search the photo library for photos of a paper receipt or till slip that mention {product} or {brand}. For each photo found, run text recognition and return the photo path, the date taken and the recognised text. If there are no results, say zero matches.'
+- delegate --target photo-agent --instruction 'Search the photo library for photos of a paper receipt or till slip, and for photos of an appliance rating plate or serial label, that mention {product} or {brand}. For each photo found, run text recognition and return the photo path, the date taken, whether it is a receipt or a rating plate, and the recognised text. If there are no results, say zero matches.'
 
-Then extract purchase data from the real document paths returned by file-agent:
+Then extract purchase data from the real document paths returned by file-agent, keeping only files whose names do not point to a different product (a file named for a TV is not sent for a dishwasher):
 
 - delegate --target document-agent --instruction 'Extract purchase details with the receipt schema from these files: {receipt paths}. If a file returns no data with the receipt schema, try the invoice schema. For each file return store, order number, purchase date exactly as printed, product description, brand, model number, serial number if printed, price, and every other line item, especially any protection plan, extended warranty or care plan with its plan number and term. Report any file you could not read.'
 
@@ -90,15 +90,17 @@ If no purchase record is found in either result, tell the user "I couldn't find 
 
 First by name:
 
-- delegate --target file-agent --instruction 'Find files whose names contain any of: warranty, guarantee, garantie, protection, plan, care, extended, registration, certificate, {brand}, {model}, {series}. Search folders whose names contain Warranty, Receipts, Scans, Documents, Home or Appliances first, then all user files. File types: documents and images. Return full path, file name, size and modified date for each, up to 50. If there are no results, say zero matches.'
+- delegate --target file-agent --instruction 'Find files whose names contain any of: warranty, guarantee, garantie, protection, plan, care, extended, registration, certificate, terms, conditions, {brand}, {model}, {series}, {store}. Search folders whose names contain Warranty, Receipts, Scans, Documents, Home or Appliances first, then all user files. File types: documents and images. Return full path, file name, size and modified date for each, up to 50. If there are no results, say zero matches.'
 
-Then confirm by content, because a file named "scan_0042.pdf" can be the plan terms:
+Then confirm by content, because a file named "scan_0042.pdf" can be the plan terms. If the receipt lists a protection plan and no candidate name mentions a plan, also ask file-agent for every document in folders whose names contain Scans, up to 50, and add those to the check:
 
 - delegate --target document-agent --instruction 'With intent locate_content and evidence mode focused, check these files: {candidate paths from file-agent}. List only the files that are a warranty, guarantee, protection plan or warranty registration for {brand} {model} or the series {series}, or a plan bought with order {order number}. For each, quote the line that shows it. If none match, say zero matches.'
 
 Then read the terms from the confirmed files only:
 
 - delegate --target document-agent --instruction 'Answer from these files only: {confirmed warranty and plan paths}. With intent period and answer mode table, return for each document: the provider, each coverage (full parts and labour, parts only, or named components such as motor, compressor or panel) with its term, how the start date is defined, and any printed start or end date. With intent condition, return the exclusions and the claim procedure (phone, email or web form exactly as written, required attachments). Also return any plan number, registration number and serial number written on it. Quote the page or section for each answer.'
+
+If the receipt lists a protection plan but no plan terms are confirmed, the label is Unclear with "would be covered by plan {plan number} once its terms are confirmed", the claim contact is "not found on the NAS, ask {store}", and Notes say which document is missing.
 
 If no warranty document is confirmed, check whether the receipt or the manual states a warranty term and label it "stated on the receipt" or "stated in the manual". If nothing states a term, say so. Do not assume a typical term.
 
@@ -108,7 +110,7 @@ Whenever a receipt and at least one warranty document exist, cross-check them:
 
 - delegate --target document-agent --instruction 'Reconcile these files and report every difference in brand, model number, serial number, purchase date, plan start or end date, or owner name: {receipt path}, {confirmed warranty and plan paths}. For each difference give both values and the file each came from. If they all agree, say no differences found.'
 
-If a rating-plate photo of this product exists (Step 0 or Step 1), compare its serial and model with the reconciled values too.
+Send only document paths to reconcile. For a receipt that exists only as a photo, and for any rating-plate photo of this product from Step 0 or Step 1, compare the photo-agent's recognised serial and model with the reconciled values yourself.
 
 Then the parent computes each end date from the real purchase date and term with [references/coverage-rules.md](references/coverage-rules.md), compares it with today, and picks one label: **Covered**, **Partly covered**, **Not covered** or **Unclear**, using the label table in that file. Show the reasoning in one line, for example: "Bought 14 Mar 2024 + 2-year warranty = ended 14 Mar 2026. Protection plan EPP-3Y-90417733 runs to 14 Mar 2029, so covered by the plan."
 
@@ -118,7 +120,7 @@ Report every mismatch plainly with both values and both files. Never hide one to
 
 - delegate --target file-agent --instruction 'Find files whose names contain any of: manual, guide, instructions, handbook, quick start, {model}, {series}, {brand}. Search folders whose names contain Manuals, Documents, Downloads, Home or Appliances first, then all user files. File type: documents. Return full path, file name, size and modified date, up to 20. If there are no results, say zero matches.'
 
-If two results share a name stem and size, ask file-agent for the sha256sum of both; if they are identical, keep the copy in the more specific folder and note that a duplicate exists. Then confirm which file is the manual for this model with the same locate_content check as Step 2.
+If no result name contains the brand, model or series, treat it as zero matches. Otherwise confirm which files are the manual for this model with the same locate_content check as Step 2. If two confirmed files have the same size, ask file-agent for the sha256sum of both; if they are identical, keep the copy in the more specific folder and note that a duplicate exists.
 
 If no manual is confirmed, tell the user "There is no manual for {brand} {model} on your NAS", give only the universal safety advice from the coverage rules (switch off at the wall; for a leak, also close the water supply), and offer to save the claim draft or a reminder in Step 5. Do not improvise repair steps.
 
@@ -126,7 +128,7 @@ Otherwise ask the real manual found upstream:
 
 - delegate --target document-agent --instruction 'Using only {manual path}, with intent locate_content and answer mode table, find what the manual says about error code {code} and about the symptom "{symptom}". Return the matching rows of the error-code and troubleshooting tables (problem, cause, what to do) in the order printed, the safety warnings that apply to those steps, any steps that need a qualified technician, and any statement that user repairs affect the warranty. Give the page or section for each item.'
 
-Present the steps as a short numbered checklist in the manual's order, safety warning first. Mark technician-only steps, and say when a do-it-yourself step could affect the warranty.
+Write `{symptom}` as what the appliance is doing ("leaking", "not cooling"), not vague words such as "doing this again"; with an error code and no description, send the code alone. Present the steps as a short numbered checklist in the manual's order, safety warning first. Mark technician-only steps, and say when a do-it-yourself step could affect the warranty.
 
 ### Step 5. Claim draft and approval
 
@@ -183,7 +185,7 @@ Failure rules:
 - **Unreadable file.** If an expert cannot read a file (a blurred photo, a scan with no text), name the file, mark its facts unknown, and suggest re-scanning it.
 - **Expert error.** If a delegation reports `failed`, retry once with the same real values. If it fails again, report `failed` for that step and deliver the rest of the answer, marked as partial.
 - **Conflicting documents.** Never pick the convenient value. Show both values and their files, and apply the conflict rules in [references/coverage-rules.md](references/coverage-rules.md).
-- **Safety.** For gas, a burning smell, smoke, sparks, or any leak from an appliance connected to mains power, the first line of the answer tells the user to switch off at the wall, close the water or gas supply if relevant, and call a qualified technician if it persists, before any coverage detail.
+- **Safety.** For gas, a burning smell, smoke, sparks, or any leak from an appliance connected to mains power (including an error code whose manual row mentions water in the appliance), the first line of the answer tells the user to switch off at the wall, close the water or gas supply if relevant, and call a qualified technician if it persists, before any coverage detail.
 
 # Safety and data handling
 

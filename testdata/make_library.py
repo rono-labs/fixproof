@@ -2,7 +2,8 @@
 """Generate the fictional fixproof test library into ./home-library/ (deterministic).
 Run: .venv/bin/python project/testdata/make_library.py
 All brands, stores, people and addresses are invented."""
-import random, shutil, io
+import random, shutil, io, re
+from datetime import datetime
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -245,6 +246,16 @@ make_pdf("Documents/Misc/recipe_collection.pdf", "Recipes", "Family Kitchen",
 
 # ---------------- photos ----------------
 rng = np.random.default_rng(SEED); prng = random.Random(SEED)
+def save_jpg(img, p, quality):
+    """Save JPEG; for IMG_YYYYMMDD_HHMMSS names write EXIF DateTimeOriginal (36867) and DateTime (306)."""
+    m = re.match(r"IMG_(\d{8})_(\d{6})", Path(p).name)
+    if not m:
+        img.save(p, quality=quality); return
+    stamp = datetime.strptime(m.group(1) + m.group(2), "%Y%m%d%H%M%S").strftime("%Y:%m:%d %H:%M:%S")
+    ex = Image.Exif(); ex[306] = stamp
+    ex.get_ifd(0x8769)[36867] = stamp; ex.get_ifd(0x8769)[36868] = stamp
+    img.save(p, quality=quality, exif=ex.tobytes())
+
 def font(sz):
     for p in ("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", "/usr/share/fonts/dejavu/DejaVuSansMono.ttf"):
         try: return ImageFont.truetype(p, sz)
@@ -266,7 +277,7 @@ def phone_photo(rel, lines, size=(1200, 1600), angle=-3.0, plate=False):
     arr += rng.normal(0, 9, arr.shape)
     img = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.8))
     img = img.resize((img.width * 3 // 4, img.height * 3 // 4))
-    p = OUT / rel; p.parent.mkdir(parents=True, exist_ok=True); img.save(p, quality=82)
+    p = OUT / rel; p.parent.mkdir(parents=True, exist_ok=True); save_jpg(img, p, 82)
 
 phone_photo("Photos/Phone/2023-06/IMG_20230602_181404.jpg", [
     ("HOMEHUB APPLIANCES", 44, 1), ("77 Harbor Road, Port Alder OR", 28, 0), ("", 28, 0),
@@ -282,6 +293,49 @@ phone_photo("Photos/Phone/2024-03/IMG_20240316_190455.jpg", [
     ("NORDVIK", 44, 1), ("MODEL: ADW-4820", 36, 0), ("SERIAL: NV48-2203-1187", 36, 0), ("120V 60Hz 15A  1800W", 30, 0),
     ("MFD 2023-12", 28, 0)], size=(1200, 800), angle=-4.1, plate=True)
 
+def panel_photo(rel, brand, code, size=(1200, 900)):
+    """Phone photo of a dishwasher control panel with a small 7-segment display showing a blinking code."""
+    r = np.random.default_rng(SEED + 100); W, H = size
+    yy, xx = np.mgrid[0:H, 0:W]
+    base = 150 + 25 * np.sin(xx / 5.0 + r.normal(0, .02, (H, W)).cumsum(1) * 0.3)  # brushed steel streaks
+    arr = np.stack([base * 0.95, base * 0.97, base], -1) + r.normal(0, 4, (H, W, 3))
+    arr *= (1.15 - 0.45 * ((xx - W * 0.35) ** 2 + (yy - H * 0.4) ** 2) / (W * W))[..., None]
+    img = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8)); d = ImageDraw.Draw(img)
+    d.rounded_rectangle([60, 70, W - 60, H - 90], 24, outline=(105, 108, 112), width=6)
+    f = font(46)
+    d.text((110, 120), brand.upper(), font=f, fill=(55, 58, 62)); d.text((108, 118), brand.upper(), font=f, fill=(222, 224, 228))
+    d.rectangle([W - 330, 125, W - 110, 150], fill=(60, 62, 66))
+    dx0, dy0, dx1, dy1 = 330, 260, 870, 520  # display window
+    d.rounded_rectangle([dx0 - 14, dy0 - 14, dx1 + 14, dy1 + 14], 18, fill=(40, 42, 46))
+    d.rectangle([dx0, dy0, dx1, dy1], fill=(8, 10, 12))
+    seg = {"E": "adefg", "1": "bc", "5": "acdfg"}
+    def digit(x, y, w, h, t, ch, col):
+        S = {"a": (x + t, y, x + w - t, y + t), "g": (x + t, y + h // 2 - t // 2, x + w - t, y + h // 2 + t // 2),
+             "d": (x + t, y + h - t, x + w - t, y + h), "f": (x, y + t, x + t, y + h // 2 - 2),
+             "b": (x + w - t, y + t, x + w, y + h // 2 - 2), "e": (x, y + h // 2 + 2, x + t, y + h - t),
+             "c": (x + w - t, y + h // 2 + 2, x + w, y + h - t)}
+        for k in seg[ch]: d.rectangle(S[k], fill=col)
+    glow = Image.new("RGB", img.size, (0, 0, 0)); gd = ImageDraw.Draw(glow)
+    for i, ch in enumerate(code):
+        x = dx0 + 45 + i * 165
+        digit(x, dy0 + 45, 120, 170, 20, ch, (255, 70, 30))
+        gd2 = ImageDraw.Draw(glow); digit(x, dy0 + 45, 120, 170, 20, ch, (255, 60, 20))
+    del gd2
+    img = Image.fromarray(np.clip(np.asarray(img).astype(np.float32) + np.asarray(glow.filter(ImageFilter.GaussianBlur(14))) * 0.9, 0, 255).astype(np.uint8))
+    d = ImageDraw.Draw(img)
+    for i, lab in enumerate(["POWER", "CYCLE", "DELAY", "START"]):
+        cx = 190 + i * 270; cy = 700
+        d.ellipse([cx - 45, cy - 45, cx + 45, cy + 45], fill=(88, 90, 95), outline=(60, 62, 66), width=4)
+        d.ellipse([cx - 38, cy - 40, cx + 38, cy + 34], fill=(120, 122, 127))
+        d.text((cx - 5 * len(lab) * 2, cy + 60), lab, font=font(20), fill=(50, 52, 56))
+    d.ellipse([W - 190, 195, W - 160, 225], fill=(255, 90, 40))  # status LED
+    img = img.rotate(2.2, resample=Image.BICUBIC, expand=True, fillcolor=(60, 56, 52)).filter(ImageFilter.GaussianBlur(1.1))
+    a = np.asarray(img).astype(np.float32) + r.normal(0, 5, (img.height, img.width, 3))
+    img = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8)).resize((img.width * 3 // 4, img.height * 3 // 4))
+    p = OUT / rel; p.parent.mkdir(parents=True, exist_ok=True); save_jpg(img, p, 82)
+
+panel_photo("Photos/Phone/2026-11/IMG_20261120_083012.jpg", "Nordvik", "E15")
+
 def scenic(rel, seed, size=(1600, 1200)):
     r = np.random.default_rng(seed); W, H = size
     y = np.linspace(0, 1, H)[:, None, None]
@@ -291,7 +345,7 @@ def scenic(rel, seed, size=(1600, 1200)):
     for _ in range(6):
         x0, y0 = int(r.integers(0, W)), int(r.integers(H // 3, H)); rad = int(r.integers(60, 260))
         d.ellipse([x0 - rad, y0 - rad, x0 + rad, y0 + rad], fill=tuple(int(v) for v in r.integers(30, 230, 3)))
-    p = OUT / rel; p.parent.mkdir(parents=True, exist_ok=True); img.filter(ImageFilter.GaussianBlur(3)).save(p, quality=80)
+    p = OUT / rel; p.parent.mkdir(parents=True, exist_ok=True); save_jpg(img.filter(ImageFilter.GaussianBlur(3)), p, 80)
 for i, rel in enumerate(["Photos/Phone/2024-03/IMG_20240309_142210.jpg", "Photos/Phone/2024-03/IMG_20240322_093001.jpg",
                          "Photos/Phone/2023-06/IMG_20230610_201145.jpg", "Photos/Vacation_2025/DSC_0041.jpg",
                          "Photos/Vacation_2025/DSC_0042.jpg", "Downloads/wallpaper_final.jpg"]):
