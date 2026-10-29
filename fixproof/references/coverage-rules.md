@@ -1,46 +1,65 @@
 # Coverage rules
 
-These rules turn the real dates and terms returned by the document-agent into a verdict. They are applied by the parent; no expert is asked to judge coverage.
+These rules turn the real dates and terms returned by the document-agent into a verdict. The parent applies them. No expert is asked to judge coverage.
+
+## Reading dates
+
+- Use dates exactly as printed. If a printed date can be read two ways (06/02/2023 can be 2 June or 6 February), decide with the store's country format, the order number, the file name or the photo's date taken, in that order. State the reading in Notes. If nothing settles it, use both readings. If they give different labels, the label is Unclear.
+- File modified dates are copy or upload dates. Never use them as purchase dates.
 
 ## Start date
 
-1. Use the start rule written in the warranty or plan. If it says "from delivery" and a delivery date is on the receipt or order confirmation, use the delivery date.
-2. If the document says "from purchase" or gives no rule, use the purchase date on the receipt.
-3. A protection plan that "starts when the manufacturer warranty ends" starts on the day after the base warranty end date.
-4. If the only purchase date is the user's own statement, use it and label the verdict "based on the date you gave".
+1. A start or end date printed on the warranty or plan document wins over any calculation.
+2. Otherwise use the start rule written in the document. "From delivery" uses the delivery date on the receipt or order confirmation, if one is present.
+3. "From purchase", or no rule at all, uses the purchase date on the receipt.
+4. A plan that "starts when the manufacturer warranty ends" with no printed date starts on the day the base warranty ends. If a printed date differs from the calculated one by a day, note it and keep the printed date. A one-day gap is not a conflict.
+5. If the only purchase date is the user's own statement, use it and add "based on the date you gave" to the reasoning.
 
 ## End date
 
 - End date = start date + term, on the same calendar day. For 29 February with a term in whole years, use 28 February.
 - A term given in months adds calendar months.
-- Coverage counts as active on the end date itself.
-- If two documents give different terms for the same coverage, do not choose one. Report both with their files and set the verdict to Unclear.
+- Coverage is active on the end date itself.
+- If two documents give different terms for the same coverage, report both terms with their files and set the label to Unclear.
 
-## Which coverage applies to the fault
+## Labels
 
-| Coverage type | Applies when |
+| Label | When |
 |---|---|
-| Full parts and labour | Any fault not listed as an exclusion |
-| Parts only | Any fault, but say labour is not covered |
-| Named component (motor, compressor, panel, drum) | Only when the manual's cause for the symptom points to that component. If the cause is not clear, say "may be covered if the technician confirms a {component} fault" |
-| Protection plan | As written in the plan terms, including its own exclusions |
+| Covered | An active coverage applies to the whole fault. For a named-component coverage (panel, board, motor, compressor), use Covered when the manual's cause or the symptom points to a listed component, and add "if the technician confirms a {component} fault". |
+| Partly covered | An active coverage applies to only part of the likely causes. Example: the general warranty has ended, but the compressor warranty is active and "not cooling" may or may not be the compressor. Name what is and is not covered. |
+| Not covered | Every coverage has ended. Say when the last one ended. Troubleshooting is still given. |
+| Unclear | Documents conflict on a term or date, a serial number differs between the receipt, registration and plate photo, the warranty may belong to another appliance, or the only likely cause is an exclusion. Always add what would make the label definite. Example: "Would be partly covered (compressor, to 10 Jan 2027) once the serial is confirmed." |
 
 ## Exclusions
 
-Compare the symptom and the manual's likely cause with the exclusions list. Typical matches: improper installation, wrong detergent, limescale, accidental damage, cosmetic damage, consumables such as filters and bulbs. A match makes the verdict Unclear with the exclusion quoted, never "Not covered", because only the provider decides.
+Compare the manual's causes for the symptom with the exclusions list. Typical exclusions: improper installation, wrong detergent, limescale, accidental damage, cosmetic damage, consumables such as filters, gaskets and bulbs.
+
+- When the manual lists only one cause and that cause is excluded, the label is Unclear. Quote the exclusion.
+- When the manual lists several causes and only some are excluded, keep the label and add a Note that quotes the exclusion, for example "a worn door gasket is excluded; an internal leak is covered".
+- Only the provider decides on an exclusion, so the skill never says Not covered because of one.
 
 ## Cross-check outcomes
 
-| Finding | Effect on verdict |
+| Finding | Effect |
 |---|---|
-| Model on receipt and warranty differ in series (ADW-4820 vs ADW-4800 series) | No effect; note the series match |
-| Model differs in type or brand | Unclear; the warranty may belong to another appliance |
-| Serial on warranty registration differs from receipt or rating-plate photo | Unclear; ask the user to read the plate |
-| Owner name differs | Note only |
+| Model on the receipt is in the series on the warranty or manual (ADW-4820 and ADW-48xx) | Treat as a match. Note the series. |
+| Model differs in type or brand | Unclear. The document may belong to another appliance. |
+| Serial on the registration differs from the receipt or the plate photo | Unclear. Show both values and files. Ask the user to read the plate. |
+| Owner name differs | Note only. |
+| Two byte-identical copies of a document | Use one and note the duplicate. |
 
-## Sweep ordering
+## Universal safety advice
 
-1. Coverage ending within the window, soonest first.
-2. Active coverage ending after the window.
-3. Ended coverage, most recent first, only if the user asks for everything.
-4. Appliances with term unknown.
+When there is no manual, these lines are the only advice allowed:
+
+- Switch the appliance off at the wall or unplug it.
+- If it is leaking, close the water supply valve.
+- If you smell gas or burning, or see smoke or sparks, leave it off and call a qualified technician.
+
+## Sweep groups
+
+1. **Ending soon**: coverage that ends within the window, soonest first, with the total purchase price of these products as "value losing cover".
+2. **Active later**: coverage that ends after the window.
+3. **Unknown**: "purchase date unknown" (a warranty with no receipt), "term unknown" (a receipt with no term), "no receipt found" (a manual only).
+4. **Ended**: only if the user asks for everything, most recent first. Products whose every coverage has ended are otherwise counted in one closing line, for example "3 older appliances are out of warranty".
