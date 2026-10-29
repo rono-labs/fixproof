@@ -17,7 +17,7 @@ A second mode lists every warranty that runs out in the next 90 days.
 | Path | What |
 |---|---|
 | `fixproof/` | The Skill package: `SKILL.md` plus linked `references/*.md`. This folder is what gets zipped and installed. |
-| `testdata/` | A fictional family NAS library (27 files) and the expected answer for 6 scenarios. |
+| `testdata/` | A fictional family NAS library (28 files) and the expected answer for 6 scenarios. |
 | `validation/` | Dry-run transcripts of the skill against the test library. |
 | `tools/` | Package checker, zip builder, proposal PDF builder. |
 

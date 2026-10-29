@@ -11,7 +11,9 @@ Use these lines in this order. Leave out a line when it does not apply. Plain te
       1. {step}
       2. {step}
       Technician only: {steps the manual reserves}
-    Claim: draft ready for {claim contact}. Save it to your NAS? (yes / no)
+    Claim: draft ready for {claim contact}. {save question from Step 5}
+      after yes: Claim draft saved to {path}.
+      after no: Claim draft not saved; it stays in this chat.
     Evidence:
       - {path}: purchase date, model, serial
       - {path}: warranty term, exclusions, claim contact
