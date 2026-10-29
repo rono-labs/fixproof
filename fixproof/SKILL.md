@@ -120,6 +120,8 @@ Then the parent computes each end date from the real purchase date and term with
 
 Report every mismatch plainly with both values and both files. Never hide one to make the answer neater.
 
+When the user asks only about coverage and reports no fault ("when does the dishwasher warranty run out?"), list each coverage with its end date, skip Steps 4 and 5, and offer the manual lookup in one line. Report `completed`.
+
 ### Step 4. Troubleshooting from the manual
 
 - delegate --target file-agent --instruction 'Find files whose names contain any of: manual, guide, instructions, handbook, quick start, {model}, {series}, {brand}. Search folders whose names contain Manuals, Documents, Downloads, Home or Appliances first, then all user files. File type: documents. Return full path, file name, size and modified date, up to 20. If there are no results, say zero matches.'
