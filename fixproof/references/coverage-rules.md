@@ -59,7 +59,7 @@ When there is no manual, these lines are the only advice allowed:
 
 ## Sweep groups
 
-1. **Ending soon**: coverage that ends within the window, soonest first, with the total purchase price of these products as "value losing cover".
+1. **Ending soon**: coverage that ends within the window, soonest first, with the sum of these products' own line-item prices as "value losing cover".
 2. **Active later**: coverage that ends after the window.
 3. **Unknown**: "purchase date unknown" (a warranty with no receipt), "term unknown" (a receipt with no term), "no receipt found" (a manual only).
 4. **Ended**: only if the user asks for everything, most recent first. Products whose every coverage has ended are otherwise counted in one closing line, for example "3 older appliances are out of warranty".

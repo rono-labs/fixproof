@@ -22,6 +22,16 @@ Use these lines in this order. Leave out a line when it does not apply. Plain te
 
 When the symptom involves gas, smoke, a burning smell, sparks, or a leak from an appliance on mains power, the safety line moves above the product line.
 
+## Coverage question only
+
+    Product: {brand} {model} ({product}), bought {purchase date} at {store}
+    Coverage:
+      - {coverage name}: {ended | runs to} {end date} ({path})
+      - {coverage name}: {ended | runs to} {end date} ({path})
+    Need the manual's steps for a fault? Tell me what it is doing.
+    Evidence: {paths}
+    Notes: {mismatches or "none"}
+
 ## Claim draft
 
     To: {claim contact exactly as written}

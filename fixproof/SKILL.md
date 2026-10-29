@@ -61,7 +61,7 @@ People photograph the blinking display and the rating plate before they ask. Pho
 
 - delegate --target photo-agent --instruction 'Search photos taken in the last 48 hours, up to {now}, for pictures of an appliance control panel or display showing an error code, or of an appliance rating plate or serial label. If the search cannot filter by time, take the 20 newest photos instead. For each photo found, up to 20, run text recognition and return the photo path, the time taken, the recognised text, and which kind of appliance the photo shows. If there are no results, say zero matches.'
 
-From the recognised text, take the error code, brand, model and serial if present, and add the photos to the evidence list. Use a photo only when it shows an error code, a rating plate or a brand, and one of these holds: the kind of appliance it shows matches the product the user named; or it shows only a display, with no appliance type visible, and the user's words point to it ("doing this", "this code", "see the photo"). Take a code from a photo only when the user gave none, and ignore photos showing a different code from the user's. Never take a brand or model from a photo for a product type other than the one the user named. Ignore every other recent photo. If the user's words and the photo disagree (the user says dishwasher, the plate says washing machine), ask which one, report `waiting_user`, and stop until the user replies. An empty result is normal: continue with the user's words.
+From the recognised text, take the error code, brand, model and serial if present, and add the photos to the evidence list. Use a photo only when it shows an error code, a rating plate or a brand, and one of these holds: the kind of appliance it shows matches the product the user named; or it shows only a display, with no appliance type visible, and the user's words point to it ("doing this", "this code", "see the photo"). A code the user typed that happens to equal the photo's code does not count as pointing to it. Take a code from a photo only when the user gave none, and ignore photos showing a different code from the user's. Never take a brand or model from a photo for a product type other than the one the user named. Ignore every other recent photo. If the user's words and the photo disagree (the user says dishwasher, the plate says washing machine), ask which one, report `waiting_user`, and stop until the user replies. An empty result is normal: continue with the user's words.
 
 ### Step 1. Find the purchase record
 
@@ -98,7 +98,7 @@ If the receipt lists a protection plan and no result name mentions a plan, terms
 
 Then confirm by content, because a file named "scan_0042.pdf" can be the plan terms:
 
-- delegate --target document-agent --instruction 'With intent locate_content and evidence mode focused, check these files: {candidate paths whose names suggest warranty, plan, terms or registration, or name no product}. List only the files that are a warranty, guarantee, protection plan or warranty registration for {brand} {model} or the series {series}, or a plan bought with order {order number}. For each, quote the line that shows it. If none match, say zero matches.'
+- delegate --target document-agent --instruction 'With intent locate_content and evidence mode focused, check these files: {candidate paths whose names suggest warranty, plan, terms or registration and name no other product, or name no product}. List only the files that are a warranty, guarantee, protection plan or warranty registration for {brand} {model} or the series {series}, or a plan bought with order {order number}. For each, quote the line that shows it. If none match, say zero matches.'
 
 Then read the terms from the confirmed files only:
 
@@ -177,7 +177,7 @@ Add the photo-agent's receipt text as purchase rows. Match warranties and manual
 
 ### Step S3. Calendar
 
-List, soonest first, coverage ending within the window, then active coverage beyond it, then unknowns. Under "Ending soon", add the total purchase price of those products, from the receipts, as "value losing cover". When a rating plate's serial differs from the receipt or registration for that model, mark the item "serial to check before claiming". For each item ending soon, add one practical line drawn from its documents, for example "claims need the receipt and a rating-plate photo".
+List, soonest first, coverage ending within the window, then active coverage beyond it, then unknowns. Under "Ending soon", add the sum of those products' own line-item prices from the receipts (not receipt totals, not plans or accessories) as "value losing cover". When a rating plate's serial differs from the receipt or registration for that model, mark the item "serial to check before claiming". For each item ending soon, add one practical line drawn from its documents, for example "claims need the receipt and a rating-plate photo".
 
 Offer to save the calendar, report `waiting_approval`, and only after a clear yes:
 
