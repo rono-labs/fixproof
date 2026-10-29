@@ -22,7 +22,7 @@ Give the user a correct, evidence-backed answer about a broken appliance in one 
 Establish these before the first delegation:
 
 - **Mode.** Fault mode when the user describes a problem or asks about one product. Sweep mode when the user asks which warranties are expiring or wants an overview.
-- **Product** (fault mode): the appliance type, such as dishwasher, washing machine, fridge, TV or router, plus brand and model if given. A photo found in Step 0 can supply it. For name searches, `{product}` means the type plus its common short names (washing machine: washer, WM; fridge: refrigerator, FR; TV: television).
+- **Product** (fault mode): the appliance type, such as dishwasher, washing machine, fridge, TV or router, plus brand and model if given. A photo found in Step 0 can supply it. For name searches, `{product}` means the type plus its common short names (washing machine: washer, WM; fridge: refrigerator, FR; TV: television; dishwasher: DW). Add only short names you are sure of. A name search matches substrings, so filter results by product afterwards ("washer" also matches "dishwasher").
 - **Symptom** (fault mode): the user's own words, plus any error code (for example E15, F21, or a blinking light pattern). A photo found in Step 0 can supply the code.
 - **Window** (sweep mode): default 90 days. When the user names months ("next three months"), use calendar months from today.
 - **Today's date and time**, from the system clock. All coverage arithmetic uses the date.
@@ -61,7 +61,7 @@ People photograph the blinking display and the rating plate before they ask. Pho
 
 - delegate --target photo-agent --instruction 'Search photos taken in the last 48 hours, up to {now}, for pictures of an appliance control panel or display showing an error code, or of an appliance rating plate or serial label. If the search cannot filter by time, take the 20 newest photos instead. For each photo found, up to 20, run text recognition and return the photo path, the time taken, the recognised text, and which kind of appliance the photo shows. If there are no results, say zero matches.'
 
-From the recognised text, take the error code, brand, model and serial if present, and add the photos to the evidence list. Use a photo only when it shows an error code, a rating plate or a brand, and one of these holds: the kind of appliance it shows matches the product the user named; or it shows only a display, with no appliance type visible, and the user points to it ("doing this", "this code", "see the photo") or names no symptom. Take a code from a photo only when the user gave none, and ignore photos showing a different code from the user's. Ignore every other recent photo. If the user's words and the photo disagree (the user says dishwasher, the plate says washing machine), ask which one, report `waiting_user`, and stop until the user replies. An empty result is normal: continue with the user's words.
+From the recognised text, take the error code, brand, model and serial if present, and add the photos to the evidence list. Use a photo only when it shows an error code, a rating plate or a brand, and one of these holds: the kind of appliance it shows matches the product the user named; or it shows only a display, with no appliance type visible, and the user's words point to it ("doing this", "this code", "see the photo"). Take a code from a photo only when the user gave none, and ignore photos showing a different code from the user's. Never take a brand or model from a photo for a product type other than the one the user named. Ignore every other recent photo. If the user's words and the photo disagree (the user says dishwasher, the plate says washing machine), ask which one, report `waiting_user`, and stop until the user replies. An empty result is normal: continue with the user's words.
 
 ### Step 1. Find the purchase record
 
@@ -73,11 +73,11 @@ Many paper receipts exist only as phone photos:
 
 - delegate --target photo-agent --instruction 'Search the photo library for photos of a paper receipt or till slip that mention {product} or {brand}, and for photos of any appliance rating plate or serial label. Newest first, up to 20 of each. For each photo found, run text recognition and return the photo path, the date taken, whether it is a receipt or a rating plate, and the recognised text. If there are no results, say zero matches.'
 
-Then extract purchase data from the real document paths returned by file-agent, keeping only files whose names do not point to a different product (a file named for a TV is not sent for a dishwasher):
+Then extract purchase data from the real document paths returned by file-agent, keeping only files whose names do not point to a different product (a file named for a TV is not sent for a dishwasher). If no file remains, send no extraction:
 
 - delegate --target document-agent --instruction 'Extract purchase details with the receipt schema from these files: {receipt paths}. If a file returns no data with the receipt schema, try the invoice schema. For each file return store, order number, purchase date exactly as printed, product description, brand, model number, serial number if printed, price, any warranty term printed on the receipt, and every other line item, especially any protection plan, extended warranty or care plan with its plan number and term. Report any file you could not read.'
 
-Keep rating plates whose text names {brand}, {model} or {product}, or whose model matches a receipt extracted above; ignore the rest. For a receipt that exists only as a photo, use the photo-agent's recognised text as the purchase record and say so in the evidence list. Drop files and photos whose name or text points to a different product before deciding whether a purchase record exists; a file in a receipts folder whose name names no product stays a candidate.
+Keep a rating plate only when its model matches the model the user gave or a receipt extracted above; ignore the rest. For a receipt that exists only as a photo, use the photo-agent's recognised text as the purchase record and say so in the evidence list. Drop files and photos whose name or text points to a different product before deciding whether a purchase record exists; a file in a receipts folder whose name names no product stays a candidate.
 
 If no purchase record is found in either result, tell the user "I couldn't find a receipt for your {product} on the NAS. Do you know roughly when you bought it?", report `waiting_user`, and stop until the user replies. If they give a date, label the verdict "based on the date you gave". If they do not know, skip the verdict and continue from Step 4. Never invent a purchase date.
 
@@ -98,7 +98,7 @@ If the receipt lists a protection plan and no result name mentions a plan, terms
 
 Then confirm by content, because a file named "scan_0042.pdf" can be the plan terms:
 
-- delegate --target document-agent --instruction 'With intent locate_content and evidence mode focused, check these files: {candidate paths from file-agent, without files whose names point to a different product}. List only the files that are a warranty, guarantee, protection plan or warranty registration for {brand} {model} or the series {series}, or a plan bought with order {order number}. For each, quote the line that shows it. If none match, say zero matches.'
+- delegate --target document-agent --instruction 'With intent locate_content and evidence mode focused, check these files: {candidate paths whose names suggest warranty, plan, terms or registration, or name no product}. List only the files that are a warranty, guarantee, protection plan or warranty registration for {brand} {model} or the series {series}, or a plan bought with order {order number}. For each, quote the line that shows it. If none match, say zero matches.'
 
 Then read the terms from the confirmed files only:
 
@@ -124,7 +124,7 @@ Report every mismatch plainly with both values and both files. Never hide one to
 
 - delegate --target file-agent --instruction 'Find files whose names contain any of: manual, guide, instructions, handbook, quick start, {model}, {series}, {brand}. Search folders whose names contain Manuals, Documents, Downloads, Home or Appliances first, then all user files. File type: documents. Return full path, file name, size and modified date, up to 20. If there are no results, say zero matches.'
 
-If no result is named both as a manual (manual, guide, instructions, handbook, quick start) and with the brand, model or series, treat it as zero matches. Otherwise confirm by content:
+If no result is named both as a manual (manual, guide, instructions, handbook, quick start) and with the brand, model or series, treat it as zero matches. Otherwise confirm by content, sending only files named as a manual and with the brand, model or series:
 
 - delegate --target document-agent --instruction 'With intent locate_content, check these files: {manual candidate paths}. List only the files that are the user manual or guide for {brand} {model} or the series {series}, and quote the line that shows it. If none match, say zero matches.'
 
@@ -140,11 +140,11 @@ Otherwise ask the real manual found upstream:
 
 - delegate --target document-agent --instruction 'Using only {manual path}, with intent locate_content and answer mode table, find what the manual says about error code {code} and about the symptom "{symptom}". Return the matching rows of the error-code and troubleshooting tables (problem, cause, what to do) in the order printed, the safety warnings that apply to those steps, any steps that need a qualified technician, and any statement that user repairs affect the warranty. Give the page or section for each item.'
 
-Write `{symptom}` as what the appliance is doing ("leaking", "not cooling"), not vague words such as "doing this again"; with an error code and no description, send the code alone. Present the steps as a short numbered checklist in the manual's order, safety warning first. Mark technician-only steps, and say when a do-it-yourself step could affect the warranty.
+Write `{symptom}` as what the appliance is doing ("leaking", "not cooling"), not vague words such as "doing this again"; with an error code and no description, send the code alone. If the user says the fault is a repeat and the manual says to call service when it returns, put that line first in the checklist. If the manual has no entry for the code or symptom, say "The manual for {brand} {model} has no entry for {code}", give only the universal safety advice, and never use another model's manual. Otherwise present the steps as a short numbered checklist in the manual's order, safety warning first. Mark technician-only steps, and say when a do-it-yourself step could affect the warranty.
 
 ### Step 5. Claim draft and approval
 
-Only when the label is Covered, Partly covered or Unclear, compose a claim draft with [references/answer-format.md](references/answer-format.md): the claim contact exactly as written, product, brand, model, serial, purchase date, store, order number, plan number, the fault with its error code, "Already tried: none confirmed", and the attachments the procedure asks for, listed by their real paths. An attachment that is not on the NAS (for example a photo of the rear label) is listed as "not on the NAS, take one before sending" and mentioned in Notes. If the plate serial and the registered serial differ, use the plate value, show the registered value beside it, and mark it to be checked.
+Only when the label is Covered, Partly covered or Unclear, compose a claim draft with [references/answer-format.md](references/answer-format.md): the claim contact exactly as written in the coverage that applies today (the plan's contact once the manufacturer warranty has ended), product, brand, model, serial, purchase date, store, order number, plan number, the fault with its error code, "Already tried: none confirmed", and the attachments the procedure asks for, listed by their real paths. An attachment that is not on the NAS (for example a photo of the rear label) is listed as "not on the NAS, take one before sending" and mentioned in Notes. If the plate serial and the registered serial differ, use the plate value, show the registered value beside it, and mark it to be checked.
 
 Show the draft. If a checklist was shown, ask once: "Which of these steps have you already tried? Say yes to save the draft to your NAS, or no." Without a checklist, ask only "Save this draft to your NAS? (yes / no)". Report `waiting_approval`. Add the tried steps the user names to "Already tried". Only after a clear yes:
 
@@ -161,7 +161,7 @@ Reply in the order set out in [references/answer-format.md](references/answer-fo
 ### Step S1. Collect paperwork
 
 - delegate --target file-agent --instruction 'Find files whose names contain any of: receipt, invoice, order, purchase, warranty, guarantee, protection, plan, registration, terms, conditions, manual, guide. Also list every document in folders whose names contain Receipts, Warranty, Manuals, Scans or Appliances. File types: documents and images. Return full path, file name, size and modified date for each, up to 200. If there are no results, say zero matches.'
-- delegate --target photo-agent --instruction 'Search the photo library for photos of paper receipts or till slips for appliances or electronics, newest first, up to 30. For each photo found, run text recognition and return the photo path, the date taken and the recognised text. If there are no results, say zero matches.'
+- delegate --target photo-agent --instruction 'Search the photo library for photos of paper receipts or till slips for appliances or electronics, and for photos of appliance rating plates or serial labels, newest first, up to 30 of each. For each photo found, say whether it is a receipt or a rating plate, run text recognition and return the photo path, the date taken and the recognised text. If there are no results, say zero matches.'
 
 If both results are empty, say "I found no receipts, warranty documents or manuals on the NAS", report `completed` with nothing to list, and stop.
 
@@ -175,7 +175,7 @@ Add the photo-agent's receipt text as purchase rows. Match warranties and manual
 
 ### Step S3. Calendar
 
-List, soonest first, coverage ending within the window, then active coverage beyond it, then unknowns. Under "Ending soon", add the total purchase price of those products, from the receipts, as "value losing cover". For each item ending soon, add one practical line drawn from its documents, for example "claims need the receipt and a rating-plate photo".
+List, soonest first, coverage ending within the window, then active coverage beyond it, then unknowns. Under "Ending soon", add the total purchase price of those products, from the receipts, as "value losing cover". When a rating plate's serial differs from the receipt or registration for that model, mark the item "serial to check before claiming". For each item ending soon, add one practical line drawn from its documents, for example "claims need the receipt and a rating-plate photo".
 
 Offer to save the calendar, report `waiting_approval`, and only after a clear yes:
 
