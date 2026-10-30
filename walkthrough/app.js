@@ -66,9 +66,10 @@
   function lightTree() {
     var seen = {}, now = {};
     if (state.sc) {
-      for (var i = 0; i < state.shown; i++) {
+      var lim = Math.min(state.shown, state.sc.steps.length);
+      for (var i = 0; i < lim; i++) {
         state.sc.steps[i].files.forEach(function (f) {
-          if (i === state.shown - 1) now[f] = true; else seen[f] = true;
+          if (i === lim - 1 && state.shown <= state.sc.steps.length) now[f] = true; else seen[f] = true;
         });
       }
     }
@@ -233,7 +234,7 @@
         st.appendChild(document.createTextNode("of purchase value loses cover"));
         sec.appendChild(st);
       }
-      if (b.rest) sec.appendChild(rich(el("p"), b.rest));
+      if (b.rest) sec.appendChild(rich(el("p"), cap(b.rest)));
       if (b.lines.length) sec.appendChild(listFrom(b.lines));
       card.appendChild(sec);
     });
@@ -316,6 +317,7 @@
     var it = el("p", "intake");
     it.textContent = "How the Skill reads it: " + sc.intake;
     chat.appendChild(it);
+    document.body.classList.toggle("instant", !!all);
     if (all) {
       for (var u = 0; u < total(sc); u++) { addUnit(u); }
       state.shown = total(sc);

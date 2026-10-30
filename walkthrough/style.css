@@ -9,13 +9,13 @@ code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 .tagline{color:var(--mute);font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .badge{flex:none;font-size:13px;background:#fff7e0;color:#7a5a00;border:1px solid #f0dc9c;border-radius:999px;padding:5px 12px;font-weight:600}
 .shell{flex:1;display:flex;min-height:0}
-.library{width:340px;flex:none;background:#fff;border-right:1px solid var(--line);padding:16px 14px;display:flex;flex-direction:column;min-height:0}
+.library{width:372px;flex:none;background:#fff;border-right:1px solid var(--line);padding:16px 14px;display:flex;flex-direction:column;min-height:0}
 .library h2{font-size:15px;margin:0 0 10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
 .library h2 .sub{text-transform:none;letter-spacing:0;font-weight:400;font-size:13px;margin-left:6px}
-.tree{flex:1;overflow-y:auto;font-size:14px;line-height:1.35}
+.tree{flex:1;overflow-y:auto;font-size:13.5px;line-height:1.3}
 .tree .dir{font-weight:700;color:#2b3a35;padding:3px 0 1px}
 .tree .dir.d1{margin-top:6px}
-.tree .file{display:flex;align-items:center;gap:6px;padding:2px 6px;margin:1px 0;border-radius:6px;color:#4a5853;word-break:break-all;border-left:3px solid transparent;transition:background .3s,color .3s}
+.tree .file{display:flex;align-items:center;gap:6px;padding:2px 6px;margin:1px 0;border-radius:6px;color:#4a5853;overflow-wrap:anywhere;border-left:3px solid transparent;transition:background .3s,color .3s}
 .tree .file::before{content:"";width:6px;height:6px;border-radius:50%;background:#cdd7d3;flex:none}
 .tree .file.seen{color:#14513e;background:#eaf5f0}
 .tree .file.seen::before{background:#7cc4a9}
@@ -92,3 +92,11 @@ ul.cal li{margin:8px 0;padding-left:0}
 .statusline .st{font-weight:700;padding:3px 12px;border-radius:999px;background:#e7ecea;color:#33433d}
 .statusline .st.completed{background:#d6f0e4;color:#0a5b41}
 .statusline .st.waiting_approval{background:#fdecc8;color:#6b4800}
+.tab,.btn,.counter{white-space:nowrap}
+.tabs{flex:none}
+.tab{padding:8px 13px}
+.btn{padding:8px 15px}
+.library{width:352px}
+.controls{padding:12px 24px;gap:12px}
+code.path{padding:0 4px}
+body.instant *{animation:none!important}
