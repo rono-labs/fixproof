@@ -2,7 +2,7 @@
 
 Something broke. Your NAS already has the receipt, the warranty and the manual. fixproof is a Skill for Uliya, the assistant on UGREEN AI NAS, that turns those files into a coverage answer, the manual's fix and a ready claim.
 
-![fixproof walkthrough replaying the dishwasher E15 scenario](docs/walkthrough.png)
+![fixproof answer for the dishwasher E15 scenario: Covered by the protection plan, safety first, manual steps, claim](docs/walkthrough.png)
 
 Demo video: {{video_url}}
 
@@ -24,7 +24,7 @@ A second mode answers "Which warranties run out in the next three months?" and t
 - **Without a NAS (30 seconds):** open `walkthrough/index.html` in a browser after one build step. It replays three recorded validation runs step by step: which agent was asked what, what it found, and which files in the library it read.
 
       python3 walkthrough/build.py
-      python3 -m http.server 8000 -d walkthrough    # then open http://127.0.0.1:8000/
+      python3 -m http.server 8000 -d walkthrough    # open http://127.0.0.1:8000/
 
   Scenarios: A (dishwasher E15, covered by the plan, claim saved), C (fridge serial off by one digit, Unclear), E (warranty sweep).
 
@@ -47,7 +47,7 @@ The skill is plain Markdown: `fixproof/SKILL.md` holds the steps and the exact i
 
 ## Validation
 
-There was no NAS to run on during Round 1, so the skill was tested as a tabletop run against `testdata/home-library/`, a fictional 28-file family library with deliberate traps: a decoy 2019 dishwasher receipt, a washer receipt that exists only as a phone photo, a duplicate manual in Downloads, a TV with no manual, and a fridge whose registered serial differs from its rating plate by one digit. Each expert was played from the real files (pdftotext, the images and their EXIF dates, file-name matching, sha256sum). The final run passed 8 of 8 scenarios with 65 delegations. Results and transcripts are in [`validation/RESULTS.md`](validation/RESULTS.md); the expected answers are in [`testdata/README.md`](testdata/README.md).
+No NAS was available while building it, so the skill was tested as a tabletop run against `testdata/home-library/`, a fictional 28-file family library with deliberate traps: a decoy 2019 dishwasher receipt, a washer receipt that exists only as a phone photo, a duplicate manual in Downloads, a TV with no manual, and a fridge whose registered serial differs from its rating plate by one digit. Each expert was played from the real files (pdftotext, the images and their EXIF dates, file-name matching, sha256sum). The final run passed 8 of 8 scenarios with 65 delegations. Results and transcripts are in [`validation/RESULTS.md`](validation/RESULTS.md); the expected answers are in [`testdata/README.md`](testdata/README.md).
 
 ## Built with
 
@@ -75,7 +75,7 @@ Check and package:
     python3 tools/check_skill.py fixproof
     python3 tools/package_skill.py fixproof dist/fixproof.zip
 
-Official check with the UGREEN Skill Developer Package (uliya-skill-kit 0.7.3, Node 18+) unzipped next to this repo. It reports `"status": "static-pass"` with 0 errors and 0 warnings:
+Optional official check with the UGREEN Skill Developer Package (uliya-skill-kit 0.7.3, Node 18+), downloaded from the hackathon resources page and unzipped next to this repo. It reports `"status": "static-pass"` with 0 errors and 0 warnings:
 
     node ../uliya-skill-kit/scripts/check-skill.mjs fixproof
 

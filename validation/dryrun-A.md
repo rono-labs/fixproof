@@ -37,7 +37,7 @@ Parent: ADW-4820 plate matches only the 2024 receipt. Settled; 2019 to Notes. Se
 **5. file-agent**
 > Read only; do not change any file. Find files whose names contain any of: warranty, guarantee, garantie, protection, plan, care, extended, registration, certificate, terms, conditions, Nordvik, ADW-4820, ADW-48xx, Brightline. Search folders whose names contain Warranty, Receipts, Scans, Documents, Home or Appliances first, then the rest of the home folder and the shared folders this user can access. File types: documents and images. Return full path, file name, size and modified date for each, up to 50. If there are no results, say zero matches.
 
-Result: 10, same as v6 (ADW-4820 card, EPP terms scan, Lumora TV warranty, WM-7 card, FR-560 registration, three Brightline receipts, two ADW-48xx manuals). A "terms" name and a Scans result exist, so no extra Scans listing.
+Result: 10 (ADW-4820 card, EPP terms scan, Lumora TV warranty, WM-7 card, FR-560 registration, three Brightline receipts, two ADW-48xx manuals). A "terms" name and a Scans result exist, so no extra Scans listing.
 
 **6. document-agent**
 > Read only; do not change any file. Read the contents of these files: Documents/Warranty/Nordvik_ADW-4820_warranty_card.pdf, Scans/2024/Brightline_EPP_terms_scan.pdf. List only the files that are a warranty, guarantee, protection plan or warranty registration for Nordvik ADW-4820 or the series ADW-48xx, or a plan bought with order BL-2024-0314-55871. For each, quote the line that shows it. If none match, say zero matches.
@@ -127,4 +127,4 @@ Notes: A 2019 Nordvik ADW-3100 (receipt 22 Aug 2019) also exists; the plate phot
 Status `completed`, saved. Delegations: 13 (photo 2, file 4, document 6, knowledge 1).
 
 ## Check
-Expected outcome met in every item. PASS. Same as v6.
+Expected outcome met in every item. PASS.

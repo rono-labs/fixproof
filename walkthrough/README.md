@@ -7,6 +7,7 @@ Scenarios: A (dishwasher E15, covered, claim saved), C (fridge, Unclear serial),
 Run it:
 
     python3 build.py && python3 -m http.server 8000
-    open http://127.0.0.1:8000/   (or open index.html directly, it works from file://)
+
+Then open http://127.0.0.1:8000/ in a browser, or open index.html directly (it works from file://).
 
 `?s=A&step=all` renders a whole scenario at once. `python3 test_build.py` checks the generated data. `python3 e2e_check.py OUT_DIR` clicks through all three scenarios in headless Chromium and saves screenshots to `OUT_DIR`.

@@ -45,4 +45,4 @@ Notes: A 2019 Nordvik ADW-3100 (receipt 22 Aug 2019) also exists; the plate phot
 Status `completed`. Delegations: 7 (photo 1, file 2, document 4).
 
 ## Check
-ADW-4820 by plate; base ended 14 Mar 2026, plan to 14 Mar 2029, motor to 14 Mar 2034; no checklist, no draft, manual offered in one line; completed. PASS. Same as v6.
+ADW-4820 by plate; base ended 14 Mar 2026, plan to 14 Mar 2029, motor to 14 Mar 2034; no checklist, no draft, manual offered in one line; completed. PASS.

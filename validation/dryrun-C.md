@@ -86,4 +86,4 @@ Notes: Serial mismatch: plate HH56-2201-30647 vs receipt and registration HH56-2
 Status `waiting_approval`. Delegations: 11 (photo 2, file 3, document 6).
 
 ## Check
-Unclear, general ended 2023-01-10, partly covered to 2027-01-10 once serial confirmed, not-cooling steps, draft with plate value marked. PASS. Same as v6.
+Unclear, general ended 2023-01-10, partly covered to 2027-01-10 once serial confirmed, not-cooling steps, draft with plate value marked. PASS.

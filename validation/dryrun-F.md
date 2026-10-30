@@ -28,4 +28,4 @@ I couldn't find a receipt for your coffee machine on the NAS. Do you know roughl
 Status `waiting_user`. Delegations: 2 (file 1, photo 1). No dishwasher, fridge or TV document used.
 
 ## Check
-Nothing found, asks when bought, waiting_user, no dishwasher documents. PASS. Same as v6.
+Nothing found, asks when bought, waiting_user, no dishwasher documents. PASS.

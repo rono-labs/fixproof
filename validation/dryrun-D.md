@@ -71,4 +71,4 @@ Notes: The claim needs a photo of the rear label showing the serial; there is no
 Status `completed`, not saved. Delegations: 9 (photo 2, file 3, document 4).
 
 ## Check
-Covered to 2026-12-01, 11 days, panel/board/PSU; no manual, universal safety only; draft to care@lumora-tv.example; declined, completed, not saved. PASS. Same as v6.
+Covered to 2026-12-01, 11 days, panel/board/PSU; no manual, universal safety only; draft to care@lumora-tv.example; declined, completed, not saved. PASS.

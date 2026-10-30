@@ -79,4 +79,4 @@ Notes: The receipt exists only as a phone photo. 06/02/2023 is read as 2 June 20
 Status `completed`. Delegations: 9 (photo 2, file 3, document 4).
 
 ## Check
-Not covered, 2 June 2023 reading, ended 2025-06-02, F21 drain steps, no draft, completed. PASS. Same as v6.
+Not covered, 2 June 2023 reading, ended 2025-06-02, F21 drain steps, no draft, completed. PASS.
