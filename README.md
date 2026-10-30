@@ -30,6 +30,12 @@ Check and package (Python 3.10+, no dependencies):
     python3 project/tools/check_skill.py project/fixproof
     python3 project/tools/package_skill.py project/fixproof submission/fixproof.zip
 
+Official check, with the UGREEN kit (uliya-skill-kit-0.7.3-en.zip, Node 18+) unzipped next to the repo:
+
+    node ../uliya-skill-kit/scripts/check-skill.mjs project/fixproof
+
+It reports `"status": "static-pass"` with 0 errors and 0 warnings.
+
 Regenerate the test library (needs reportlab, Pillow, numpy):
 
     .venv/bin/python project/testdata/make_library.py
