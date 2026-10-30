@@ -6,11 +6,12 @@ Use these lines in this order. Leave out a line when it does not apply. Plain te
 
     Product: {brand} {model} ({product}), bought {purchase date} at {store}
     Coverage: {Covered | Partly covered | Not covered | Unclear}. {one-line reasoning with dates}
-    Safety first: {one warning quoted from the manual, or the universal safety advice when there is no manual}
+    Safety first: {one warning quoted from the manual, or the universal safety advice when there is no manual or no entry for the code}
     Try this (manual {section or page}):
       1. {step}
       2. {step}
       Technician only: {steps the manual reserves}
+    Support: {contact printed in the manual, with page; only when Not covered and the manual has no entry for the code}
     Claim: draft ready for {claim contact}. {save question from Step 5}
       after yes: Claim draft saved to {path}.
       after no: Claim draft not saved; it stays in this chat.
@@ -41,7 +42,7 @@ When the symptom involves gas, smoke, a burning smell, sparks, or a leak from an
     Coverage: {warranty or plan name and number}, valid until {end date}
     Fault: {symptom in plain words}, error code {code}
     Already tried: {steps the user confirmed, or "none confirmed"}
-    Attachments: {receipt path}, {warranty path}, {plan path}, {photo of rating plate if required}
+    Attachments: {each file the claim procedure asks for, by real path; the plan terms path only when asked for}
     Contact: {left blank for the user to fill in}
 
 The draft never contains the user's address, phone or email unless the user types them in.

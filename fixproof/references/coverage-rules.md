@@ -12,7 +12,7 @@ These rules turn the real dates and terms returned by the document-agent into a 
 1. A start or end date printed on the warranty or plan document wins over any calculation.
 2. Otherwise use the start rule written in the document. "From delivery" uses the delivery date on the receipt or order confirmation, if one is present.
 3. "From purchase", or no rule at all, uses the purchase date on the receipt.
-4. A plan that "starts when the manufacturer warranty ends" with no printed date starts on the day the base warranty ends. If a printed date differs from the calculated one by a day, note it and keep the printed date. A one-day gap is not a conflict.
+4. A plan that "starts when the manufacturer warranty ends" with no printed date starts on the day after the base warranty ends, because the base warranty is still active on its end date. If a printed date differs from the calculated one by a day, note it and keep the printed date. A one-day gap is not a conflict.
 5. If the only purchase date is the user's own statement, use it and add "based on the date you gave" to the reasoning.
 
 ## End date
@@ -51,7 +51,7 @@ Compare the manual's causes for the symptom with the exclusions list. Typical ex
 
 ## Universal safety advice
 
-When there is no manual, these lines are the only advice allowed:
+When there is no manual, or the manual has no entry for the code or symptom, these lines are the only advice allowed. Include only the lines that fit the appliance (no water valve for a TV):
 
 - Switch the appliance off at the wall or unplug it.
 - If it is leaking, close the water supply valve.

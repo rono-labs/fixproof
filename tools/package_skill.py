@@ -1,24 +1,23 @@
 #!/usr/bin/env python3
-"""Check a skill folder and zip it deterministically.
+"""Check a skill folder and zip it, keeping each file's real modified time.
 
 Usage: package_skill.py <skill_dir> <out.zip>
 """
 import sys
+import time
 import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from check_skill import check  # noqa: E402
 
-FIXED_TIME = (2026, 1, 1, 0, 0, 0)
-
-
 def build(root, out):
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         for path in sorted(root.rglob("*")):
             if not path.is_file() or any(part.startswith(".") for part in path.relative_to(root).parts):
                 continue
-            info = zipfile.ZipInfo(f"{root.name}/{path.relative_to(root).as_posix()}", FIXED_TIME)
+            mtime = time.localtime(path.stat().st_mtime)[:6]
+            info = zipfile.ZipInfo(f"{root.name}/{path.relative_to(root).as_posix()}", mtime)
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = 0o644 << 16
             zf.writestr(info, path.read_bytes())

@@ -22,14 +22,14 @@ Give the user a correct, evidence-backed answer about a broken appliance in one 
 Establish these before the first delegation:
 
 - **Mode.** Fault mode when the user describes a problem or asks about one product. Sweep mode when the user asks which warranties are expiring or wants an overview.
-- **Product** (fault mode): the appliance type, such as dishwasher, washing machine, fridge, TV or router, plus brand and model if given. A photo found in Step 0 can supply it. For name searches, `{product}` means the type plus its common short names (washing machine: washer, WM; fridge: refrigerator, FR; TV: television; dishwasher: DW). Add only short names you are sure of. A name search matches substrings, so filter results by product afterwards ("washer" also matches "dishwasher").
+- **Product** (fault mode): the appliance type, such as dishwasher, washing machine, fridge, TV or router, plus brand and model if given. A photo found in Step 0 can supply it. For name searches, `{product}` means the type plus its common short names (washing machine: washer, WM; fridge: refrigerator, FR; TV: television; dishwasher: DW). Add only short names you are sure of, and use them in file-agent instructions only; in a photo-agent instruction, `{product}` is the type alone. A name search matches substrings, so filter results by product afterwards ("washer" also matches "dishwasher").
 - **Symptom** (fault mode): the user's own words, plus any error code (for example E15, F21, or a blinking light pattern). A photo found in Step 0 can supply the code.
 - **Window** (sweep mode): default 90 days. When the user names months ("next three months"), use calendar months from today.
 - **Today's date and time**, from the system clock. All coverage arithmetic uses the date.
 
 If the product is still unknown after Step 0, ask one short question ("Which appliance is it?"), report status `waiting_user`, and stop until the user replies. Do not guess the product.
 
-How values move between steps: every `{slot}` in a delegate instruction below is replaced with the real value from an upstream result (a path, model number or date that an expert actually returned) or from the user's words before the delegation is sent. Never send a slot unfilled, and never write "the file from before" inside an instruction. If a slot has no real value, leave that part of the instruction out and say what is missing. For example, with no series known, "names contain any of: manual, guide, Lumora, 55Q8" simply has no series term.
+How values move between steps: every `{slot}` in a delegate instruction below is replaced with the real value from an upstream result (a path, model number or date that an expert actually returned) or from the user's words before the delegation is sent. Never send a slot unfilled, and never refer to an earlier result without its real value. If a slot has no real value, leave that part of the instruction out and say what is missing. For example, with no series known, "names contain any of: manual, guide, Lumora, 55Q8" simply has no series term.
 
 **Model series.** Manuals often cover a series. Derive `{series}` from the real model number: keep the letters and the first two digits and replace the remaining digits with x (ADW-4820 becomes ADW-48xx). Search for both the model and the series. If the model has fewer than four digits or does not start with letters (WM-7, 55Q8), leave the series out.
 
@@ -59,6 +59,8 @@ Keep an **evidence list** for the whole conversation: every file used, with its 
 
 People photograph the blinking display and the rating plate before they ask. Phone backup puts those photos on the NAS.
 
+Skip Step 0 when the user reports no fault and gives no code ("when does the dishwasher warranty run out?"), unless the product is unknown.
+
 - delegate --target photo-agent --instruction 'Search photos taken in the last 48 hours, up to {now}, for pictures of an appliance control panel or display showing an error code, or of an appliance rating plate or serial label. If the search cannot filter by time, take the 20 newest photos instead. For each photo found, up to 20, run text recognition and return the photo path, the time taken, the recognised text, and which kind of appliance the photo shows. If there are no results, say zero matches.'
 
 From the recognised text, take the error code, brand, model and serial if present, and add the photos to the evidence list. Use a photo only when it shows an error code, a rating plate or a brand, and one of these holds: the kind of appliance it shows matches the product the user named; or it shows only a display, with no appliance type visible, and the user's words point to it ("doing this", "this code", "see the photo"). A code the user typed that happens to equal the photo's code does not count as pointing to it. Take a code from a photo only when the user gave none, and ignore photos showing a different code from the user's. Never take a brand or model from a photo for a product type other than the one the user named. Ignore every other recent photo. If the user's words and the photo disagree (the user says dishwasher, the plate says washing machine), ask which one, report `waiting_user`, and stop until the user replies. An empty result is normal: continue with the user's words.
@@ -73,7 +75,7 @@ Many paper receipts exist only as phone photos:
 
 - delegate --target photo-agent --instruction 'Search the photo library for photos of a paper receipt or till slip that mention {product} or {brand}, and for photos of any appliance rating plate or serial label. Newest first, up to 20 of each. For each photo found, run text recognition and return the photo path, the date taken, whether it is a receipt or a rating plate, and the recognised text. If there are no results, say zero matches.'
 
-Then extract purchase data from the real document paths returned by file-agent, keeping only files whose names do not point to a different product (a file named for a TV is not sent for a dishwasher). If no file remains, send no extraction:
+Then extract purchase data from the real document paths returned by file-agent, keeping only receipts, orders and invoices (by name or by a Receipts, Invoices, Purchases or Orders folder, never warranty cards or manuals) whose names do not point to a different product (a file named for a TV is not sent for a dishwasher). If no file remains, send no extraction:
 
 - delegate --target document-agent --instruction 'Extract purchase details with the receipt schema from these files: {receipt paths}. If a file returns no data with the receipt schema, try the invoice schema. For each file return store, order number, purchase date exactly as printed, product description, brand, model number, serial number if printed, price, any warranty term printed on the receipt, and every other line item, especially any protection plan, extended warranty or care plan with its plan number and term. Report any file you could not read.'
 
@@ -140,13 +142,13 @@ If no manual is confirmed, tell the user "There is no manual for {brand} {model}
 
 Otherwise ask the real manual found upstream:
 
-- delegate --target document-agent --instruction 'Using only {manual path}, with intent locate_content and answer mode table, find what the manual says about error code {code} and about the symptom "{symptom}". Return the matching rows of the error-code and troubleshooting tables (problem, cause, what to do) in the order printed, the safety warnings that apply to those steps, any steps that need a qualified technician, and any statement that user repairs affect the warranty. Give the page or section for each item.'
+- delegate --target document-agent --instruction 'Using only {manual path}, with intent locate_content and answer mode table, find what the manual says about error code {code} and about the symptom "{symptom}". Return the matching rows of the error-code and troubleshooting tables (problem, cause, what to do) in the order printed, the safety warnings that apply to those steps, any steps that need a qualified technician, and any statement that user repairs affect the warranty. If there is no entry for the code or symptom, return the support or service contact printed in the manual. Give the page or section for each item.'
 
-Write `{symptom}` as what the appliance is doing ("leaking", "not cooling"), not vague words such as "doing this again"; with an error code and no description, send the code alone. If the user says the fault is a repeat and the manual says to call service when it returns, put that line first in the checklist. If the manual has no entry for the code or symptom, say "The manual for {brand} {model} has no entry for {code}", give only the universal safety advice, and never use another model's manual. Otherwise present the steps as a short numbered checklist in the manual's order, safety warning first. Mark technician-only steps, and say when a do-it-yourself step could affect the warranty.
+Write `{symptom}` as what the appliance is doing ("leaking", "not cooling"), not vague words such as "doing this again"; with an error code and no description, send the code alone. If the user says the fault is a repeat and the manual says to call service when it returns, put that line first in the checklist. If the manual has no entry for the code or symptom, say "The manual for {brand} {model} has no entry for {code}", give only the universal safety advice, and never use another model's manual. If the label is Not covered, also give the support contact printed in that manual, with its page, as the next step. Otherwise present the steps as a short numbered checklist in the manual's order, safety warning first. Mark technician-only steps, and say when a do-it-yourself step could affect the warranty.
 
 ### Step 5. Claim draft and approval
 
-Only when the label is Covered, Partly covered or Unclear, compose a claim draft with [references/answer-format.md](references/answer-format.md): the claim contact exactly as written in the coverage that applies today (the plan's contact once the manufacturer warranty has ended), product, brand, model, serial, purchase date, store, order number, plan number, the fault with its error code, "Already tried: none confirmed", and the attachments the procedure asks for, listed by their real paths. An attachment that is not on the NAS (for example a photo of the rear label) is listed as "not on the NAS, take one before sending" and mentioned in Notes. If the plate serial and the registered serial differ, use the plate value, show the registered value beside it, and mark it to be checked.
+Only when the label is Covered, Partly covered or Unclear, compose a claim draft with [references/answer-format.md](references/answer-format.md): the claim contact exactly as written in the coverage that applies today (the plan's contact once the manufacturer warranty has ended), product, brand, model, serial, purchase date, store, order number, plan number, the fault with its error code, "Already tried: none confirmed", and the attachments the procedure asks for, listed by their real paths. List the plan terms file as an attachment only when the procedure asks for it; otherwise give the plan number in the body. An attachment that is not on the NAS (for example a photo of the rear label) is listed as "not on the NAS, take one before sending" and mentioned in Notes. If the plate serial and the registered serial differ, use the plate value, show the registered value beside it, and mark it to be checked.
 
 Show the draft. If a checklist was shown, ask once: "Which of these steps have you already tried? Say yes to save the draft to your NAS, or no." Without a checklist, ask only "Save this draft to your NAS? (yes / no)". Report `waiting_approval`. Add the tried steps the user names to "Already tried". Only after a clear yes:
 
@@ -156,7 +158,7 @@ Report the saved file path the knowledge-agent returns. If the user says no, rep
 
 ### Step 6. Answer
 
-Reply in the order set out in [references/answer-format.md](references/answer-format.md): safety line when it must lead, product line, coverage label with one-line reasoning, checklist, claim line, evidence list, and Notes for mismatches, exclusions, duplicates and missing documents. Leave out lines that do not apply.
+Reply in the order set out in [references/answer-format.md](references/answer-format.md): safety line when it must lead, product line, coverage label with one-line reasoning, checklist or the manual's support contact, claim line, evidence list, and Notes for mismatches, exclusions, duplicates and missing documents. Leave out lines that do not apply.
 
 ## Sweep mode
 
@@ -208,7 +210,7 @@ Failure rules:
 - Every fact in the answer comes from a file in the evidence list.
 - Each save needs its own clear yes, even if the user approved a save earlier in the conversation.
 
-Worked examples are in [references/examples.md](references/examples.md). Third-party components, licences and AI-tool disclosure are in [references/disclosure.md](references/disclosure.md). A plain-language guide is in [references/user-guide.md](references/user-guide.md).
+Worked examples are in [references/examples.md](references/examples.md). The tabletop validation of eight scenarios is in [references/validation.md](references/validation.md). Third-party components, licences and AI-tool disclosure are in [references/disclosure.md](references/disclosure.md). A plain-language guide is in [references/user-guide.md](references/user-guide.md).
 
 # Generation-time capability evidence
 
