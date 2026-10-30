@@ -43,7 +43,7 @@ Regenerate the test library (needs reportlab, Pillow, numpy):
 ## How it works
 
 1. file-agent and photo-agent find receipts, including phone photos of paper receipts and rating plates.
-2. document-agent extracts the purchase with the receipt schema: date, store, model, serial, and any protection plan line.
+2. document-agent extracts the purchase details: date, store, model, serial, and any protection plan line.
 3. file-agent searches for warranty and plan documents using the real model number. document-agent reads terms, components, exclusions and the claim procedure.
 4. The skill computes each end date, then cross-checks model and serial across the receipt, the warranty registration and the plate photo.
 5. file-agent finds the manual for the model series. document-agent returns only the rows for this error code, with the safety warnings.
