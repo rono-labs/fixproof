@@ -2,7 +2,7 @@
 
 Something broke. Your NAS already has the receipt, the warranty and the manual. fixproof is a Skill for Uliya, the assistant on UGREEN AI NAS, that turns those files into a coverage answer, the manual's fix and a ready claim.
 
-![fixproof answer for the dishwasher E15 scenario: Covered by the protection plan, safety first, manual steps, claim](docs/walkthrough.png)
+![fixproof: still under warranty? Ask your NAS. The answer card reads Covered for the Nordvik dishwasher](docs/thumbnail.png)
 
 Demo video: {{video_url}}
 
@@ -25,6 +25,8 @@ A second mode answers "Which warranties run out in the next three months?" and t
 
       python3 walkthrough/build.py
       python3 -m http.server 8000 -d walkthrough    # open http://127.0.0.1:8000/
+
+  ![fixproof answer for the dishwasher E15 scenario: Covered by the protection plan, safety first, manual steps, claim](docs/walkthrough.png)
 
   Scenarios: A (dishwasher E15, covered by the plan, claim saved), C (fridge serial off by one digit, Unclear), E (warranty sweep).
 
