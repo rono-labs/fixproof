@@ -1,6 +1,6 @@
 ---
 name: fixproof
-description: Checks whether a broken appliance is still covered, finds the manual's steps for its error code and drafts a warranty claim, using the receipts, warranty cards, protection plans, manuals and photos already on the NAS. Also lists warranties that expire soon. Use when the user says an appliance is broken, leaking or showing an error code, or asks about warranty cover.
+description: Checks whether a broken appliance is still covered, finds the manual's steps for its error code and drafts a warranty claim, using the receipts, warranty cards, protection plans, manuals and photos already on the NAS. Also lists warranties that expire soon. Use when the user says an appliance or device is broken, not working, leaking or showing an error code, or asks about warranty cover.
 ---
 
 # Fixproof
@@ -52,7 +52,7 @@ When an expert answer has no page or section for a fact, cite the file alone. Wh
 
 # Orchestration
 
-Delegation order, fault mode: `photo-agent` (recent photos) → `file-agent` and `photo-agent` (receipts) → `document-agent` (extract) → `file-agent` (warranty files) → `document-agent` (confirm, terms, reconcile) → `file-agent` and `document-agent` (manual) → `knowledge-agent` (save, after approval). Each step receives only verified values from the steps before it.
+Delegation order, fault mode: `photo-agent` (recent photos, skipped when Step 0 does not apply) → `file-agent` and `photo-agent` (receipts) → `document-agent` (extract) → `file-agent` (warranty files) → `document-agent` (confirm, terms, reconcile) → `file-agent` and `document-agent` (manual) → `knowledge-agent` (save, after approval). Each step receives only verified values from the steps before it.
 
 Delegation order, sweep mode: `file-agent` and `photo-agent` (paperwork) → `document-agent` (purchases, terms, manuals) → `knowledge-agent` (save, after approval).
 
@@ -139,7 +139,7 @@ If no result is named both as a manual (manual, guide, instructions, handbook, q
 
 If two confirmed files have the same size, check whether they are copies:
 
-- delegate --target file-agent --instruction 'Read only; do not change any file. Read only; do not change any file. Return the SHA-256 checksum of each of these files: {paths of the same-size manuals}. Report any file you could not read.'
+- delegate --target file-agent --instruction 'Read only; do not change any file. Return the SHA-256 checksum of each of these files: {paths of the same-size manuals}. Report any file you could not read.'
 
 If the sums are identical, keep the copy in the more specific folder and note that a duplicate exists.
 
@@ -157,9 +157,9 @@ Only when the label is Covered, Partly covered or Unclear, compose a claim draft
 
 Show the draft. If a checklist was shown, ask once: "Which of these steps have you already tried? Say yes to save the draft to your NAS, or no." Without a checklist, ask only "Save this draft to your NAS? (yes / no)". Report `waiting_approval`. Add the tried steps the user names to "Already tried". Only after a clear yes:
 
-- delegate --target knowledge-agent --instruction 'Save this text as a new note in a folder named Warranty claims in the user home folder, or in the default notes location if that folder cannot be used, with filename hint "Warranty claim {brand} {model} {today} {time}", with time written as four digits such as 0840. The user approved saving this exact text. Do not overwrite an existing file. Return the saved file path and whether the save was verified. Text: {claim draft text}'
+- delegate --target knowledge-agent --instruction 'Save this text as a new note in a folder named Warranty claims in the user home folder, or in the default notes location if that folder cannot be used, with filename hint "Warranty claim {brand} {model} {today} {time}", with time written as four digits such as 0840. The user approved saving this claim draft, with the steps they named added under Already tried. Do not overwrite an existing file. Return the saved file path and whether the save was verified. Text: {claim draft text}'
 
-Only after knowledge-agent returns `completed` with a saved path, report that path. If it asks for its own approval, pass the question on and report `waiting_approval`. If the user says no, report `completed` with "not saved" and keep the draft in chat. The skill never sends, emails or shares the claim; the user does that.
+Only after knowledge-agent returns `completed` with a saved path, report that path. If it asks for its own approval, pass the question on and report `waiting_approval`. If the save is not verified, say "The save could not be confirmed; check {path}" and keep the draft in chat. If the user says no, report `completed` with "not saved" and keep the draft in chat. The skill never sends, emails or shares the claim; the user does that.
 
 ### Step 6. Answer
 
@@ -190,7 +190,7 @@ Offer to save the calendar, report `waiting_approval`, and only after a clear ye
 
 - delegate --target knowledge-agent --instruction 'Save this text as a new note in a folder named Warranty claims in the user home folder, or in the default notes location if that folder cannot be used, with filename hint "Warranty calendar {today} {time}", with time written as four digits such as 0840. The user approved saving this exact text. Do not overwrite an existing file. Return the saved file path and whether the save was verified. Text: {calendar text}'
 
-Only after knowledge-agent returns `completed` with a saved path, report that path. If the user says no, report `completed` with "not saved" and keep the calendar in chat.
+Only after knowledge-agent returns `completed` with a saved path, report that path. If the save is not verified, say "The save could not be confirmed; check {path}" and keep the calendar in chat. If the user says no, report `completed` with "not saved" and keep the calendar in chat.
 
 # Completion and failure
 

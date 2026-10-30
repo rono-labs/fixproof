@@ -5,8 +5,8 @@ A Skill for Uliya, the assistant on UGREEN AI NAS. When an appliance breaks, it 
     "My dishwasher is leaking and showing E15."
 
     Coverage: Covered. The 2-year warranty ended 14 Mar 2026, but protection plan
-    EPP-3Y-90417733 runs to 14 Mar 2029 and covers this fault.
-    Safety first: unplug the dishwasher and close the water tap.
+    EPP-3Y-90417733 runs to 14 Mar 2029.
+    Safety first: turn off the water and unplug the dishwasher.
     Try this (manual section 7.2): ...
     Claim: draft ready for the Brightline plan claims line. Save it to your NAS? (yes / no)
 
@@ -17,7 +17,7 @@ A second mode lists every warranty that runs out in the next 90 days.
 | Path | What |
 |---|---|
 | `fixproof/` | The Skill package: `SKILL.md` plus linked `references/*.md`. This folder is what gets zipped and installed. |
-| `testdata/` | A fictional family NAS library (28 files) and the expected answer for 6 scenarios. |
+| `testdata/` | A fictional family NAS library (28 files) and the expected answer for 8 scenarios. |
 | `validation/` | Dry-run transcripts of the skill against the test library. |
 | `tools/` | Package checker, zip builder, proposal PDF builder. |
 
