@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>fixproof walkthrough</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="wordmark">fixproof</span>
+    <span class="tagline">Something broke. Your NAS already has the receipt, the warranty and the manual.</span>
+  </div>
+  <span class="badge" id="badge">Replay of validation dry run, fictional library. Not NAS runtime footage.</span>
+</header>
+<div class="shell">
+  <aside class="library" aria-label="Library files">
+    <h2>NAS library <span class="sub">fictional, read-only</span></h2>
+    <div id="tree" class="tree"></div>
+    <div class="legend"><span class="dot now"></span> read in this step <span class="dot seen"></span> read earlier</div>
+  </aside>
+  <main class="stage">
+    <div class="controls">
+      <nav class="tabs" aria-label="Scenarios">
+        <button class="tab" id="tab-A" data-s="A"></button>
+        <button class="tab" id="tab-C" data-s="C"></button>
+        <button class="tab" id="tab-E" data-s="E"></button>
+      </nav>
+      <div class="buttons">
+        <span class="counter" id="counter">Step 0 of 0</span>
+        <button class="btn primary" id="next">Next step</button>
+        <button class="btn" id="play">Play</button>
+        <button class="btn ghost" id="reset">Reset</button>
+      </div>
+    </div>
+    <div class="chat" id="chat"></div>
+  </main>
+</div>
+<script src="data/scenarios.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
