@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Generate the fictional fixproof test library into ./home-library/ (deterministic).
-Run: .venv/bin/python project/testdata/make_library.py
+Run: python3 testdata/make_library.py  (needs reportlab, Pillow, numpy)
 All brands, stores, people and addresses are invented."""
 import random, shutil, io, re
 from datetime import datetime

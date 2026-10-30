@@ -1,208 +1,130 @@
-# Dry run A: "The dishwasher is doing this again."
+# Dry run A (v8): "The dishwasher is doing this again."
 
-Today 2026-11-20 08:40. Paths are relative to the library root; every file has modified date 2026-10-29 (copy date, never used as a purchase date). Skill followed literally. Second user turn: "I checked the hoses, yes save it".
+Today 2026-11-20 08:40. Paths relative to testdata/home-library/. Skill: fixproof/SKILL.md (v8); references unchanged. Experts played from the real files: pdftotext for document-agent, the image itself plus EXIF DateTimeOriginal for photo-agent, case-insensitive name-substring matching (script over the real file names) for file-agent, sha256sum for duplicates, a successful save for knowledge-agent.
 
 ## Intake
-Mode: fault. Product: dishwasher (short names: DW). Symptom: "doing this again", vague, so the code alone is used later. No code, brand or model given by the user.
+Fault mode. Product: dishwasher (file-agent short name DW; photo-agent gets "dishwasher"). Symptom "doing this again" (vague, repeat). No code, brand or model typed. Fault reported, so Step 0 runs. Delegation order line (new) followed: photo-agent, then file-agent and photo-agent, then document-agent, and so on.
 
 ## Step 0
-### Delegation 1 to photo-agent
-Instruction as sent:
-> Search photos taken in the last 48 hours, up to 2026-11-20 08:40, for pictures of an appliance control panel or display showing an error code, or of an appliance rating plate or serial label. If the search cannot filter by time, take the 20 newest photos instead. For each photo found, up to 20, run text recognition and return the photo path, the time taken, the recognised text, and which kind of appliance the photo shows. If there are no results, say zero matches.
+**1. photo-agent**
+> Read only; do not change any photo. Search photos taken in the last 48 hours, up to 2026-11-20 08:40, for pictures of an appliance control panel or display showing an error code, or of an appliance rating plate or serial label. If the search cannot filter by time, take the 20 newest photos instead. For each photo found, up to 20, run text recognition and return the photo path, the time taken, the recognised text, and which kind of appliance the photo shows. If there are no results, say zero matches.
 
-Result (photo-agent played from the real image):
-1 match (photos at or after 2026-11-18 08:40; all other photos are older or carry no recent date).
-  - Photos/Phone/2026-11/IMG_20261120_083012.jpg, taken 2026-11-20 08:30:12 (EXIF DateTimeOriginal). Text read: "NORDVIK", "E15" (red 7-segment display), button labels POWER, CYCLE, DELAY, START. Kind of appliance: a control panel with a small display and four buttons; the image does not show which kind of appliance it is. No model or serial visible.
+Result (completed): 1 match. Photos/Phone/2026-11/IMG_20261120_083012.jpg, EXIF 2026:11:20 08:30:12. Text "NORDVIK", "E15", POWER, CYCLE, DELAY, START. Appliance kind not visible (panel only).
 
-Parent: the photo shows a code and a brand, only a display with no appliance type, and the user says "doing this again", which points to it. Used: code E15, brand Nordvik. Added to evidence list.
+Parent: display only, the user's words "doing this" point to it. Code E15 and brand Nordvik taken. Evidence added.
 
 ## Step 1
-### Delegation 2 to file-agent
-Instruction as sent:
-> Find files whose names contain any of: receipt, invoice, order, purchase, quittung, Nordvik, dishwasher, DW. Search folders whose names contain Receipts, Invoices, Purchases, Orders, Documents, Scans or Downloads first, then all user files. File types: documents and images. Return full path, file name, type, size and modified date for each, up to 50. If there are no results, say zero matches.
+**2. file-agent**
+> Read only; do not change any file. Find files whose names contain any of: receipt, invoice, order, purchase, quittung, Nordvik, dishwasher, DW. Search folders whose names contain Receipts, Invoices, Purchases, Orders, Documents, Scans or Downloads first, then the rest of the home folder and the shared folders this user can access. File types: documents and images. Return full path, file name, type, size and modified date for each, up to 50. If there are no results, say zero matches.
 
-(no model known, so that slot is left out.)
+Result (matcher): 8. Documents/Receipts/2019/receipt_dishwasher_old.pdf (2794); Documents/Receipts/2022/HomeHub_receipt_fridge_Jan2022.pdf (2733); Documents/Receipts/2024/Brightline_Receipt_2024-03-14_dishwasher.pdf (2969); Documents/Receipts/2025/Brightline_order_TV_Lumora.pdf (2762); Documents/Warranty/Nordvik_ADW-4820_warranty_card.pdf (2960); Downloads/ADW-48xx_manual (1).pdf (17516); Home/Appliances/Washer/Nordvik_WM-7_warranty_card.pdf (2681); Manuals/Nordvik_ADW-48xx_UserManual.pdf (17516).; the scope wording does not change it (every file sits under the one home library).
 
-Result (file-agent, substring match on names, case-insensitive):
-8 matches:
-  - Documents/Receipts/2024/Brightline_Receipt_2024-03-14_dishwasher.pdf (pdf, 2969 bytes)
-  - Documents/Receipts/2019/receipt_dishwasher_old.pdf (pdf, 2794 bytes)
-  - Documents/Receipts/2022/HomeHub_receipt_fridge_Jan2022.pdf (pdf, 2733 bytes)
-  - Documents/Receipts/2025/Brightline_order_TV_Lumora.pdf (pdf, 2762 bytes)
-  - Documents/Warranty/Nordvik_ADW-4820_warranty_card.pdf (pdf, 2960 bytes)
-  - Home/Appliances/Washer/Nordvik_WM-7_warranty_card.pdf (pdf, 2681 bytes)
-  - Manuals/Nordvik_ADW-48xx_UserManual.pdf (pdf, 17516 bytes)
-  - Downloads/ADW-48xx_manual (1).pdf (pdf, 17516 bytes)
+**3. photo-agent**
+> Read only; do not change any photo. Search the photo library for photos of a paper receipt or till slip that mention dishwasher or Nordvik, and for photos of any appliance rating plate or serial label. Newest first, up to 20 of each. For each photo found, run text recognition and return the photo path, the date taken, whether it is a receipt or a rating plate, and the recognised text. If there are no results, say zero matches.
 
-### Delegation 3 to photo-agent
-Instruction as sent:
-> Search the photo library for photos of a paper receipt or till slip that mention dishwasher, DW or Nordvik, and for photos of any appliance rating plate or serial label. Newest first, up to 20 of each. For each photo found, run text recognition and return the photo path, the date taken, whether it is a receipt or a rating plate, and the recognised text. If there are no results, say zero matches.
+Result: receipt: Photos/Phone/2023-06/IMG_20230602_181404.jpg (2023-06-02 18:14:04), HomeHub Appliances, Date 06/02/2023, Order HH-230602-1187, "Nordvik WM-7 Front Load Washer SN NV7-2305-60912 $899.00". Plates: IMG_20240316_190455.jpg (2024-03-16, NORDVIK MODEL ADW-4820 SERIAL NV48-2203-1187 MFD 2023-12); IMG_20220115_101233.jpg (2022-01-15, HomeHub FR-560 SERIAL HH56-2201-30647). Parent: receipt photo names a washer, dropped.
 
-Result (photo-agent):
-3 photos.
-  - Rating plate: Photos/Phone/2024-03/IMG_20240316_190455.jpg, taken 2024-03-16 19:04:55. Text: NORDVIK / MODEL: ADW-4820 / SERIAL: NV48-2203-1187 / 120V 60Hz 15A 1800W / MFD 2023-12. The label does not say what appliance it is on.
-  - Receipt: Photos/Phone/2023-06/IMG_20230602_181404.jpg, taken 2023-06-02 18:14:04. Text: HOMEHUB APPLIANCES / Date: 06/02/2023 Order HH-230602-1187 / Nordvik WM-7 Front Load Washer / SN NV7-2305-60912 $899.00 / Delivery $59.00 / TOTAL $958.00 (it mentions Nordvik).
-  - Rating plate: Photos/Phone/2022-01/IMG_20220115_101233.jpg, taken 2022-01-15 10:12:33. Text: HomeHub / MODEL: FR-560 / SERIAL: HH56-2201-30647 / refrigerant R600a, compressor sealed system.
+**4. document-agent** (fridge and TV receipts dropped by name; cards and manuals are not receipts)
+> Read only; do not change any file. Extract the purchase details from these receipts and invoices: Documents/Receipts/2024/Brightline_Receipt_2024-03-14_dishwasher.pdf, Documents/Receipts/2019/receipt_dishwasher_old.pdf. For each file return store, order number, purchase date exactly as printed, product description, brand, model number, serial number if printed, price, any warranty term printed on the receipt, and every other line item, especially any protection plan, extended warranty or care plan with its plan number and term. Report any file you could not read.
 
-Parent: the washer receipt photo is for a washing machine, dropped. The FR-560 plate matches no dishwasher receipt, dropped. Files named for a TV or a fridge, and the warranty and manual files, are not sent for receipt extraction. Two dishwasher receipts remain.
+Result (pdftotext): 2024: Brightline Electronics, BL-2024-0314-55871, 2024-03-14, Nordvik ADW-4820 Dishwasher, serial NV48-2203-1187, $849.00, no term; "3-Year Extended Protection Plan Plan no. EPP-3Y-90417733. Covers ADW-4820 after the manufacturer warranty ends. Terms provided separately." $129.00; installation kit $24.99. 2019: Brightline, BL-2019-0822-20318, 2019-08-22, Nordvik ADW-3100, NV31-1905-0342, $529.00, "1 year parts and labor. No extended plan purchased." No unreadable files.
 
-### Delegation 4 to document-agent
-Instruction as sent:
-> Extract purchase details with the receipt schema from these files: Documents/Receipts/2024/Brightline_Receipt_2024-03-14_dishwasher.pdf, Documents/Receipts/2019/receipt_dishwasher_old.pdf. If a file returns no data with the receipt schema, try the invoice schema. For each file return store, order number, purchase date exactly as printed, product description, brand, model number, serial number if printed, price, any warranty term printed on the receipt, and every other line item, especially any protection plan, extended warranty or care plan with its plan number and term. Report any file you could not read.
+Removing "receipt schema / invoice schema" changes nothing: the instruction still names the files as receipts and lists the same fields, and the result is identical.
 
-Result (document-agent, pdftotext of the two files):
-  - 2024 file: Brightline Electronics; order BL-2024-0314-55871; date 2024-03-14; Nordvik ADW-4820 Dishwasher (Stainless, 24 in.); brand Nordvik; model ADW-4820; serial NV48-2203-1187; $849.00; no warranty term printed. Other lines: "3-Year Extended Protection Plan", plan no. EPP-3Y-90417733, "Covers ADW-4820 after the manufacturer warranty ends. Terms provided separately.", $129.00; Installation kit $24.99. Total $1,002.99. Customer Alex Rivera.
-  - 2019 file: Brightline Electronics; order BL-2019-0822-20318; date 2019-08-22; Nordvik ADW-3100 Dishwasher; serial NV31-1905-0342; $529.00; "Manufacturer warranty: 1 year parts and labor. No extended plan purchased."; Haul-away $25.00.
-  - Both files read.
-
-Parent, choosing between candidates: two dishwasher purchases. The plate photo (ADW-4820, NV48-2203-1187) matches exactly one receipt (2024), so no question is asked. The 2019 ADW-3100 purchase goes in Notes. Plan line EPP-3Y-90417733 found on the receipt. Model ADW-4820, series ADW-48xx.
+Parent: ADW-4820 plate matches only the 2024 receipt. Settled; 2019 to Notes. Series ADW-48xx, store Brightline.
 
 ## Step 2
-### Delegation 5 to file-agent
-Instruction as sent:
-> Find files whose names contain any of: warranty, guarantee, garantie, protection, plan, care, extended, registration, certificate, terms, conditions, Nordvik, ADW-4820, ADW-48xx, Brightline. Search folders whose names contain Warranty, Receipts, Scans, Documents, Home or Appliances first, then all user files. File types: documents and images. Return full path, file name, size and modified date for each, up to 50. If there are no results, say zero matches.
+**5. file-agent**
+> Read only; do not change any file. Find files whose names contain any of: warranty, guarantee, garantie, protection, plan, care, extended, registration, certificate, terms, conditions, Nordvik, ADW-4820, ADW-48xx, Brightline. Search folders whose names contain Warranty, Receipts, Scans, Documents, Home or Appliances first, then the rest of the home folder and the shared folders this user can access. File types: documents and images. Return full path, file name, size and modified date for each, up to 50. If there are no results, say zero matches.
 
-Result (file-agent):
-10 matches:
-  - Documents/Warranty/Nordvik_ADW-4820_warranty_card.pdf (2960)
-  - Scans/2024/Brightline_EPP_terms_scan.pdf (3271)
-  - Documents/Receipts/2024/Brightline_Receipt_2024-03-14_dishwasher.pdf (2969)
-  - Documents/Receipts/2025/Brightline_order_TV_Lumora.pdf (2762)
-  - Documents/Receipts/2025/Brightline_soundbar_2025-12-18.pdf (2694)
-  - Home/Appliances/Washer/Nordvik_WM-7_warranty_card.pdf (2681)
-  - Home/Appliances/Fridge/HomeHub_FR-560_warranty_registration.pdf (2737)
-  - Scans/Lumora_TV_warranty.pdf (2560)
-  - Manuals/Nordvik_ADW-48xx_UserManual.pdf (17516)
-  - Downloads/ADW-48xx_manual (1).pdf (17516)
+Result: 10, same as v6 (ADW-4820 card, EPP terms scan, Lumora TV warranty, WM-7 card, FR-560 registration, three Brightline receipts, two ADW-48xx manuals). A "terms" name and a Scans result exist, so no extra Scans listing.
 
-Parent: the result includes "terms" and the store name, so the extra Scans listing is not run.
+**6. document-agent**
+> Read only; do not change any file. Read the contents of these files: Documents/Warranty/Nordvik_ADW-4820_warranty_card.pdf, Scans/2024/Brightline_EPP_terms_scan.pdf. List only the files that are a warranty, guarantee, protection plan or warranty registration for Nordvik ADW-4820 or the series ADW-48xx, or a plan bought with order BL-2024-0314-55871. For each, quote the line that shows it. If none match, say zero matches.
 
-### Delegation 6 to document-agent
-Instruction as sent:
-> With intent locate_content and evidence mode focused, check these files: Documents/Warranty/Nordvik_ADW-4820_warranty_card.pdf, Scans/2024/Brightline_EPP_terms_scan.pdf. List only the files that are a warranty, guarantee, protection plan or warranty registration for Nordvik ADW-4820 or the series ADW-48xx, or a plan bought with order BL-2024-0314-55871. For each, quote the line that shows it. If none match, say zero matches.
+Result: both. Card "Product: ADW-4820 Dishwasher"; scan "Covered product Nordvik ADW-4820 Dishwasher, serial NV48-2203-1187", "Purchased 2024-03-14 (Brightline order BL-2024-0314-55871)".
 
-Result (document-agent):
-Both match.
-  - Nordvik_ADW-4820_warranty_card.pdf: "LIMITED WARRANTY CARD  Product: ADW-4820 Dishwasher".
-  - Brightline_EPP_terms_scan.pdf: "Covered product  Nordvik ADW-4820 Dishwasher, serial NV48-2203-1187" and "Purchased 2024-03-14 (Brightline order BL-2024-0314-55871)".
+**7. document-agent**
+> Read only; do not change any file. Answer from these files only: Documents/Warranty/Nordvik_ADW-4820_warranty_card.pdf, Scans/2024/Brightline_EPP_terms_scan.pdf. Return a table with one row per document: the provider, each coverage (full parts and labour, parts only, or named components such as motor, compressor or panel) with its term, how the start date is defined, and any printed start or end date. Also return the exclusions and the claim procedure (phone, email or web form exactly as written, required attachments). Also return any plan number, registration number and serial number written on it. Quote the page or section for each answer. If a file has no warranty terms, say so for that file. Report any file you could not read.
 
-Parent note: candidates named for another product (WM-7 card, FR-560 registration, Lumora card) were not sent, by the same rule Step 1 uses.
-
-### Delegation 7 to document-agent
-Instruction as sent:
-> Answer from these files only: Documents/Warranty/Nordvik_ADW-4820_warranty_card.pdf, Scans/2024/Brightline_EPP_terms_scan.pdf. With intent period and answer mode table, return for each document: the provider, each coverage (full parts and labour, parts only, or named components such as motor, compressor or panel) with its term, how the start date is defined, and any printed start or end date. With intent condition, return the exclusions and the claim procedure (phone, email or web form exactly as written, required attachments). Also return any plan number, registration number and serial number written on it. Quote the page or section for each answer.
-
-Result (document-agent):
-  - Nordvik warranty card (page 1): provider Nordvik. Parts and labor 2 years, "from the original purchase date". Drive motor 10 years, "Wash motor and circulation pump motor (parts only after year 2)". Start: "Warranty starts on the date of original retail purchase. A dated receipt is required." No printed start or end date. Exclusions: "damage from misuse, improper installation, power surges, frozen pipes, commercial use, cosmetic damage, consumables (filters, racks, gaskets), and any repair attempted by anyone other than a Nordvik authorized service provider"; "Repairs made by the owner beyond the steps listed in the user manual void this warranty." Claim: "Email claims@nordvik-support.example or call 1-800-555-0188 (Mon-Fri 8:00-18:00 Pacific)"; attach a copy of the dated purchase receipt and a clear photo of the serial plate. No plan or registration number; no serial written on it (it says the plate is inside the door frame).
-  - Brightline plan terms (page 1, sections 1-5): provider Brightline Protection Services (administrator), plan EPP-3Y-90417733, plan holder Alex Rivera, covered serial NV48-2203-1187. Coverage: parts and labor for mechanical and electrical failure, "including leaks from internal components, drain pump, heater, control board and sensors". Printed: "Plan start 2026-03-14, the day after the 2-year manufacturer warranty ends"; "Plan end 2029-03-14". Exclusions (section 2): cosmetic damage, racks, filters and gaskets, misuse or improper installation, pre-existing conditions, commercial use, repairs by anyone not approved; "Owner repairs beyond the user manual's listed steps void the plan." Claim (section 3): "Email protect@brightline-services.example or call 1-800-555-0199. Have your plan number, the original receipt, and the product serial number ready." Technician within 5 business days, no deductible. Section 5: while the manufacturer warranty is in force, claims go to the manufacturer.
+Result: card p.1: parts and labor 2 years; drive motor 10 years (parts only after year 2); "Warranty starts on the date of original retail purchase"; exclusions incl. gaskets; claim "Email claims@nordvik-support.example or call 1-800-555-0188 ...". Scan p.1: plan EPP-3Y-90417733, serial NV48-2203-1187, "Plan start 2026-03-14, the day after the 2-year manufacturer warranty ends", "Plan end 2029-03-14"; s.1 covers "leaks from internal components"; s.2 excludes "racks, filters and gaskets"; s.3 "Email protect@brightline-services.example or call 1-800-555-0199. Have your plan number, the original receipt, and the product serial number ready."
 
 ## Step 3
-### Delegation 8 to document-agent
-Instruction as sent:
-> Reconcile these files and report every difference in brand, model number, serial number, purchase date, plan start or end date, or owner name: Documents/Receipts/2024/Brightline_Receipt_2024-03-14_dishwasher.pdf, Documents/Warranty/Nordvik_ADW-4820_warranty_card.pdf, Scans/2024/Brightline_EPP_terms_scan.pdf. For each difference give both values and the file each came from. If they all agree, say no differences found.
+**8. document-agent**
+> Read only; do not change any file. Reconcile these files and report every difference in brand, model number, serial number, purchase date, plan start or end date, or owner name: Documents/Receipts/2024/Brightline_Receipt_2024-03-14_dishwasher.pdf, Documents/Warranty/Nordvik_ADW-4820_warranty_card.pdf, Scans/2024/Brightline_EPP_terms_scan.pdf. For each difference give both values and the file each came from. If they all agree, say no differences found.
 
-Result (document-agent):
-No differences found. Brand Nordvik, model ADW-4820, order BL-2024-0314-55871, purchase date 2024-03-14, owner Alex Rivera and serial NV48-2203-1187 agree wherever they appear. The warranty card prints no serial, owner or date to compare.
-
-Parent: plate photo ADW-4820 / NV48-2203-1187 matches the receipt and the plan. No mismatch.
-Arithmetic: bought 14 Mar 2024 + 2 years = 14 Mar 2026, ended (today is 20 Nov 2026). Plan printed 14 Mar 2026 to 14 Mar 2029, active (rule 1: printed date wins). The plan says it starts "the day after" the warranty ends while the base term ends on 14 Mar 2026 itself; one-day gap, noted, printed date kept. Motor 10 years = 14 Mar 2034 (parts only after year 2).
-Exclusions vs manual causes for E15 (loose hose, door gasket, internal leak): gasket is excluded by the plan, the others are covered, so the label stays Covered with a note. Label: Covered.
+Result: no differences found. Plate serial agrees. Base: 14 Mar 2024 + 2 y = ended 14 Mar 2026. Plan printed 14 Mar 2026 to 14 Mar 2029 (calculated start 15 Mar, one-day gap noted, printed kept). Motor to 14 Mar 2034. Label Covered; gasket exclusion goes to Notes.
 
 ## Step 4
-### Delegation 9 to file-agent
-Instruction as sent:
-> Find files whose names contain any of: manual, guide, instructions, handbook, quick start, ADW-4820, ADW-48xx, Nordvik. Search folders whose names contain Manuals, Documents, Downloads, Home or Appliances first, then all user files. File type: documents. Return full path, file name, size and modified date, up to 20. If there are no results, say zero matches.
+**9. file-agent**
+> Read only; do not change any file. Find files whose names contain any of: manual, guide, instructions, handbook, quick start, ADW-4820, ADW-48xx, Nordvik. Search folders whose names contain Manuals, Documents, Downloads, Home or Appliances first, then the rest of the home folder and the shared folders this user can access. File type: documents. Return full path, file name, size and modified date, up to 20. If there are no results, say zero matches.
 
-Result (file-agent):
-8 matches:
-  - Manuals/Nordvik_ADW-48xx_UserManual.pdf (17516)
-  - Downloads/ADW-48xx_manual (1).pdf (17516)
-  - Documents/Warranty/Nordvik_ADW-4820_warranty_card.pdf (2960)
-  - Home/Appliances/Washer/Nordvik_WM-7_warranty_card.pdf (2681)
-  - Home/Appliances/Washer/WM-7_manual.pdf (9774)
-  - Home/Appliances/Fridge/FR-560_owner_manual.pdf (9127)
-  - Manuals/Zentro_AX3000_Router_Manual.pdf (6029)
+Result: 7 (two ADW-48xx manuals, Zentro, WM-7 and FR-560 manuals, two Nordvik warranty cards). Named as a manual and with brand/model/series: the two ADW-48xx files.
 
-Parent: named both as a manual and with brand or series: the two ADW-48xx files only.
+**10. document-agent**
+> Read only; do not change any file. Read the contents of these files: Manuals/Nordvik_ADW-48xx_UserManual.pdf, Downloads/ADW-48xx_manual (1).pdf. List only the files that are the user manual or guide for Nordvik ADW-4820 or the series ADW-48xx, and quote the line that shows it. If none match, say zero matches.
 
-### Delegation 10 to document-agent
-Instruction as sent:
-> With intent locate_content, check these files: Manuals/Nordvik_ADW-48xx_UserManual.pdf, Downloads/ADW-48xx_manual (1).pdf. List only the files that are the user manual or guide for Nordvik ADW-4820 or the series ADW-48xx, and quote the line that shows it. If none match, say zero matches.
+Result: both, "Nordvik Dishwasher Model series ADW-48xx User Manual and Care Guide" (p.1).
 
-Result (document-agent): both match. Quote: "Model series ADW-48xx  User Manual and Care Guide" (page 1), "Nordvik Dishwasher".
+**11. file-agent** (same size 17516)
+> Read only; do not change any file. Read only; do not change any file. Return the SHA-256 checksum of each of these files: Manuals/Nordvik_ADW-48xx_UserManual.pdf, Downloads/ADW-48xx_manual (1).pdf. Report any file you could not read.
 
-### Delegation 11 to file-agent
-Instruction as sent:
-> Return the sha256sum of each of these files: Manuals/Nordvik_ADW-48xx_UserManual.pdf, Downloads/ADW-48xx_manual (1).pdf.
+Result: both 2858e0506bfc17fb3076623c5b917c28c11cb91b4650cc02af821eb6bfde3b7d. Keep Manuals/, note duplicate. The doubled "Read only" prefix (defect V8-1) is harmless here.
 
-Result (file-agent): both 2858e0506bfc17fb3076623c5b917c28c11cb91b4650cc02af821eb6bfde3b7d.
-Parent: identical. Keep Manuals/Nordvik_ADW-48xx_UserManual.pdf (more specific folder), note the duplicate.
+**12. document-agent** (vague symptom, code alone)
+> Read only; do not change any file. Using only Manuals/Nordvik_ADW-48xx_UserManual.pdf, find what the manual says about error code E15. Return, as a table, the matching rows of the error-code and troubleshooting tables (problem, cause, what to do) in the order printed, the safety warnings that apply to those steps, any steps that need a qualified technician, and any statement that user repairs affect the warranty. If there is no entry for the code or symptom, return the support or service contact printed in the manual. Give the page or section for each item.
 
-### Delegation 12 to document-agent
-Instruction as sent:
-> Using only Manuals/Nordvik_ADW-48xx_UserManual.pdf, with intent locate_content and answer mode table, find what the manual says about error code E15. Return the matching rows of the error-code and troubleshooting tables (problem, cause, what to do) in the order printed, the safety warnings that apply to those steps, any steps that need a qualified technician, and any statement that user repairs affect the warranty. Give the page or section for each item.
+Result: s.7 p.9 E15 "Water detected in the base pan. Leak protection has stopped the unit." / "Turn off water, unplug, tilt unit slightly to drain base pan only if instructed, check door gasket and hose connections. If E15 returns, call service. Do not open the base." s.8 p.10 "Puddle under unit, E15 shown" / "loose hose, door gasket, or internal leak" / "Stop the unit, check hose clamps and gasket. Service call if the leak persists". Safety p.3 "Do not operate a dishwasher that is leaking. Turn off the water supply and unplug the unit." Warranty p.3 and p.10: user repair beyond listed steps voids warranty and plan.
 
-(The symptom "doing this again" is vague, so the code is sent alone.)
-
-Result (document-agent):
-  - Section 7 Error codes, page 9: E15, "Water detected in the base pan. Leak protection has stopped the unit." Action: "Turn off water, unplug, tilt unit slightly to drain base pan only if instructed, check door gasket and hose connections. If E15 returns, call service. Do not open the base."
-  - Section 8 Troubleshooting, page 10: "Puddle under unit, E15 shown"; cause "Water in base pan: loose hose, door gasket, or internal leak"; solution "Stop the unit, check hose clamps and gasket. Service call if the leak persists."
-  - Safety (section 1, page 3): "Do not operate a dishwasher that is leaking. Turn off the water supply and unplug the unit." "Disconnect power before any cleaning near electrical parts."
-  - Technician: calling service if E15 returns; opening the base is not allowed.
-  - Warranty: page 3 "any user repair beyond the steps listed in this manual (for example opening the base, replacing internal parts, or bypassing sensors) will void the manufacturer warranty and any extended protection plan"; page 10 note repeats it.
-
-Parent: the user says it is "again" and the manual says call service if E15 returns, so that line goes first. The E15 row describes water collecting inside a mains appliance, so safety leads.
+Parent: water collecting inside a mains appliance, safety leads. Repeat fault: "If E15 returns, call service" first.
 
 ## Step 5
-Draft composed (contact from the plan, because the manufacturer warranty has ended):
-
+Covered; plan contact; plan terms not an attachment (procedure does not ask), plan number in body. Draft:
 ```
 To: Email protect@brightline-services.example or call 1-800-555-0199
 Subject: Warranty claim, Nordvik ADW-4820, serial NV48-2203-1187
 Product: Nordvik ADW-4820, serial NV48-2203-1187
 Purchased: 14 Mar 2024 at Brightline Electronics, order BL-2024-0314-55871
 Coverage: 3-Year Extended Protection Plan EPP-3Y-90417733, valid until 14 Mar 2029
-Fault: dishwasher leak protection stopped the unit, repeat fault ("again"), error code E15
+Fault: water in the base pan, leak protection stopped the unit, error code E15, returned after an earlier occurrence
 Already tried: none confirmed
-Attachments: Documents/Receipts/2024/Brightline_Receipt_2024-03-14_dishwasher.pdf, Scans/2024/Brightline_EPP_terms_scan.pdf
-Contact: (left blank for you to fill in)
+Attachments: Documents/Receipts/2024/Brightline_Receipt_2024-03-14_dishwasher.pdf
+Contact:
 ```
+Asked: "Which of these steps have you already tried? Say yes to save the draft to your NAS, or no." `waiting_approval`.
 
-Checklist was shown, so the question is "Which of these steps have you already tried? Say yes to save the draft to your NAS, or no." Status `waiting_approval` (answer below, turn 1).
+User: "I checked the hoses, yes save it." Already tried becomes "checked the hose connections".
 
-User reply: "I checked the hoses, yes save it". Clear yes. "Already tried: checked the hoses (told to Uliya in chat)".
+**13. knowledge-agent** (no single quote in any slot value, so the new apostrophe rule changes nothing)
+> Save this text as a new note in a folder named Warranty claims in the user home folder, or in the default notes location if that folder cannot be used, with filename hint "Warranty claim Nordvik ADW-4820 2026-11-20 0840", with time written as four digits such as 0840. The user approved saving this exact text. Do not overwrite an existing file. Return the saved file path and whether the save was verified. Text: (draft above with "Already tried: checked the hose connections")
 
-### Delegation 13 to knowledge-agent
-Instruction as sent:
-> Save this text as a new note in a folder named Warranty claims in the user home folder, or in the default notes location if that folder cannot be used, with filename hint "Warranty claim Nordvik ADW-4820 2026-11-20 0840", with time written as four digits such as 0840. Text: To: Email protect@brightline-services.example or call 1-800-555-0199 / Subject: Warranty claim, Nordvik ADW-4820, serial NV48-2203-1187 / Product: Nordvik ADW-4820, serial NV48-2203-1187 / Purchased: 14 Mar 2024 at Brightline Electronics, order BL-2024-0314-55871 / Coverage: 3-Year Extended Protection Plan EPP-3Y-90417733, valid until 14 Mar 2029 / Fault: dishwasher leak protection stopped the unit, repeat fault ("again"), error code E15 / Already tried: checked the hoses (told to Uliya in chat) / Attachments: Documents/Receipts/2024/Brightline_Receipt_2024-03-14_dishwasher.pdf, Scans/2024/Brightline_EPP_terms_scan.pdf / Contact: (left blank)
+Result (simulated success): `completed`, path /home/alex/Warranty claims/Warranty claim Nordvik ADW-4820 2026-11-20 0840.md, verified yes. Expert-states rule satisfied (completed, path returned), so the path is reported.
 
-Result (knowledge-agent): saved. Path: /home/alex/Warranty claims/Warranty claim Nordvik ADW-4820 2026-11-20 0840.md
+Observation: "this exact text" is not quite true here: the user approved the shown draft plus their tried step, and never saw the amended line (defect V8-3).
 
 ## Final answer
-
 ```
-Safety first: Water in the base pan means a leak on a mains appliance. Switch the dishwasher off at the wall, close the water supply, and call a qualified technician if it persists. Manual: "Do not operate a dishwasher that is leaking. Turn off the water supply and unplug the unit." (page 3)
+Safety first: Water in the base pan is a leak on a mains appliance. Switch the dishwasher off at the wall, close the water supply, and call a qualified technician if it persists. Manual: "Do not operate a dishwasher that is leaking. Turn off the water supply and unplug the unit." (page 3)
 Product: Nordvik ADW-4820 (dishwasher), bought 14 Mar 2024 at Brightline Electronics
 Coverage: Covered. Bought 14 Mar 2024 + 2-year warranty = ended 14 Mar 2026. Protection plan EPP-3Y-90417733 runs 14 Mar 2026 to 14 Mar 2029, so covered by the plan.
 Try this (manual section 7 page 9, section 8 page 10):
-  1. You say E15 is back. The manual says: "If E15 returns, call service."
+  1. E15 has come back. The manual says: "If E15 returns, call service."
   2. Turn off the water and unplug the unit.
-  3. Check the door gasket and the hose connections (hose clamps). You have done the hoses.
+  3. Check the door gasket and the hose connections and clamps. You have checked the hoses.
   4. Tilt the unit slightly to drain the base pan only if instructed.
-  5. Do not open the base.
-  Technician only: anything inside the base. Warning: a user repair beyond these steps (opening the base, replacing internal parts) voids the manufacturer warranty and the protection plan (pages 3 and 10).
-Claim: draft ready for Email protect@brightline-services.example or call 1-800-555-0199 (Brightline Protection Services, plan EPP-3Y-90417733).
-  Claim draft saved to /home/alex/Warranty claims/Warranty claim Nordvik ADW-4820 2026-11-20 0840.md. Nothing was sent; you send it. Plan number, receipt and serial are needed.
+  Technician only: do not open the base. A repair beyond these steps voids the warranty and the protection plan (page 3).
+Claim: draft ready for protect@brightline-services.example (or 1-800-555-0199).
+  Claim draft saved to /home/alex/Warranty claims/Warranty claim Nordvik ADW-4820 2026-11-20 0840.md. Nothing was sent.
 Evidence:
-  - Photos/Phone/2026-11/IMG_20261120_083012.jpg: E15 and Nordvik name, taken 2026-11-20 08:30
-  - Documents/Receipts/2024/Brightline_Receipt_2024-03-14_dishwasher.pdf: purchase date 14 Mar 2024, ADW-4820, serial NV48-2203-1187, order BL-2024-0314-55871, plan line EPP-3Y-90417733
-  - Photos/Phone/2024-03/IMG_20240316_190455.jpg: rating plate ADW-4820, serial NV48-2203-1187 (matches the receipt)
-  - Documents/Warranty/Nordvik_ADW-4820_warranty_card.pdf: 2 years parts and labor, motor 10 years (to 14 Mar 2034), exclusions, claim contact
+  - Photos/Phone/2026-11/IMG_20261120_083012.jpg: E15 and Nordvik, taken 20 Nov 2026 08:30
+  - Documents/Receipts/2024/Brightline_Receipt_2024-03-14_dishwasher.pdf: purchase 14 Mar 2024, ADW-4820, serial NV48-2203-1187, order, plan EPP-3Y-90417733
+  - Photos/Phone/2024-03/IMG_20240316_190455.jpg: rating plate ADW-4820, serial NV48-2203-1187
+  - Documents/Warranty/Nordvik_ADW-4820_warranty_card.pdf: 2 years parts and labor, motor 10 years (to 14 Mar 2034), exclusions
   - Scans/2024/Brightline_EPP_terms_scan.pdf: plan 14 Mar 2026 to 14 Mar 2029, exclusions, claim contact
-  - Manuals/Nordvik_ADW-48xx_UserManual.pdf: E15 row, safety, warranty warning
-Notes: A 2019 Nordvik ADW-3100 (receipt 22 Aug 2019) also exists; the plate photo matches only the 2024 unit, so it was not used. A duplicate manual exists at Downloads/ADW-48xx_manual (1).pdf (same checksum). The plan says it starts "the day after" the warranty ends but prints 14 Mar 2026, the same day the 2-year term ends; the printed date is kept. The plan excludes gaskets: a worn door gasket is excluded, an internal leak is covered. The warranty card requires a serial-plate photo only for manufacturer claims.
+  - Manuals/Nordvik_ADW-48xx_UserManual.pdf: E15 rows, safety, warranty warning
+Notes: A 2019 Nordvik ADW-3100 (receipt 22 Aug 2019) also exists; the plate photo matches only the 2024 unit. Duplicate manual at Downloads/ADW-48xx_manual (1).pdf (same checksum). The plan says it starts the day after the warranty ends (15 Mar 2026) but prints 14 Mar 2026; printed date kept, one-day gap. The plan excludes gaskets: a worn door gasket is excluded, an internal leak is covered.
 ```
+Status `completed`, saved. Delegations: 13 (photo 2, file 4, document 6, knowledge 1).
 
-Status: `completed`, saved to /home/alex/Warranty claims/Warranty claim Nordvik ADW-4820 2026-11-20 0840.md
-
-Delegations: 13 (photo-agent x2, file-agent x4, document-agent x6, knowledge-agent x1).
+## Check
+Expected outcome met in every item. PASS. Same as v6.

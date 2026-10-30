@@ -1,6 +1,6 @@
 # fixproof test library
 
-A fictional family NAS for testing the fixproof skill. Every brand, store, person and address is invented (owner "Alex Rivera", 48 Larkspur Lane). Scenario date is 2026-11-20. Regenerate with `.venv/bin/python project/testdata/make_library.py`; output goes to `project/testdata/home-library/` and is byte-identical on each run. About 28 files, under 1 MB. Upload the `home-library` folder to the NAS as is.
+A fictional family NAS for testing the fixproof skill. Every brand, store, person and address is invented (owner "Alex Rivera", 48 Larkspur Lane). Scenario date is 2026-11-20. Regenerate with `python3 testdata/make_library.py` (needs reportlab, Pillow, numpy); output goes to `testdata/home-library/` and is byte-identical on each run. About 28 files, under 1 MB. Upload the `home-library` folder to the NAS as is.
 
 ## What each file tests
 
@@ -29,7 +29,7 @@ Noise: school newsletter, utility bill, recipes, vacation and wallpaper photos, 
 
 ## Expected answers
 
-These match `project/fixproof/references/examples.md`. Today is 2026-11-20.
+These match `fixproof/references/examples.md`. Today is 2026-11-20.
 
 A. "The dishwasher is doing this again." The skill starts from the new photo, which reads E15 and Nordvik. The rating plate photo (ADW-4820, serial NV48-2203-1187) settles the model, so it does not ask. Use the 2024 receipt, not the 2019 one (noted in Notes). Verdict: Covered. The manufacturer warranty ended 2026-03-14, and protection plan EPP-3Y-90417733 runs to 2029-03-14. Note that a worn door gasket is excluded and an internal leak is covered. Give the manual's E15 steps with safety first (turn off water, unplug, check gasket and hose connections, do not open the base, service if it returns). Note that the manual exists twice (Manuals and Downloads, same checksum) and one copy was used. The claim draft goes to protect@brightline-services.example with the plan number, receipt and serial, and shows "Already tried: none confirmed". After the user says "I checked the hoses, yes save it", the note is saved and the status is completed.
 

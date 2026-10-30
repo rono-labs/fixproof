@@ -7,7 +7,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 PROJECT = HERE.parent
-VALIDATION = PROJECT / "validation"
+VALIDATION = HERE / "transcripts"
 LIBRARY = PROJECT / "testdata" / "home-library"
 RUNS = [
     ("A", "dryrun-A.md", "Dishwasher shows E15"),
